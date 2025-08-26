@@ -11,8 +11,11 @@ type FieldErrors = {
   password?: string;
 };
 
+type UserType = "admin" | "employee" | "customer";
+
 export default function LoginForm() {
   const router = useRouter();
+  const [userType, setUserType] = useState<UserType>("admin");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,7 +26,10 @@ export default function LoginForm() {
 
   const validate = (): boolean => {
     const errs: FieldErrors = {};
-    if (!username.trim()) errs.username = "Username is required";
+    if (!username.trim()) {
+      errs.username =
+        userType === "admin" ? "Username is required" : "Email is required";
+    }
     if (!password) errs.password = "Password is required";
     else if (password.length < 6)
       errs.password = "Password must be at least 6 characters";
@@ -39,6 +45,40 @@ export default function LoginForm() {
     return Object.keys(errs).length === 0;
   };
 
+  const getApiEndpoint = () => {
+    switch (userType) {
+      case "admin":
+        return "/api/admin/login";
+      case "employee":
+        return "/api/employee/login";
+      case "customer":
+        return "/api/customer/login";
+      default:
+        return "/api/admin/login";
+    }
+  };
+
+  const getRedirectPath = () => {
+    switch (userType) {
+      case "admin":
+        return "/admin";
+      case "employee":
+        return "/employee";
+      case "customer":
+        return "/customer";
+      default:
+        return "/admin";
+    }
+  };
+
+  const getRequestBody = () => {
+    if (userType === "admin") {
+      return { username, password };
+    } else {
+      return { email: username, password };
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -46,10 +86,10 @@ export default function LoginForm() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/login", {
+      const res = await fetch(getApiEndpoint(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(getRequestBody()),
       });
 
       const data = (await res.json()) as LoginResponse;
@@ -60,7 +100,7 @@ export default function LoginForm() {
       }
 
       // Success: use Next.js router to navigate
-      router.push("/admin");
+      router.push(getRedirectPath());
     } catch (err: any) {
       setError(err?.message || "Login failed");
     } finally {
@@ -74,7 +114,27 @@ export default function LoginForm() {
       onSubmit={handleSubmit}
       noValidate
     >
-      <h2 className="text-2xl font-bold text-center text-black">Admin Login</h2>
+      <h2 className="text-2xl font-bold text-center text-black">
+        FuelFlow Login
+      </h2>
+
+      {/* User Type Selector */}
+      <div>
+        <label className="block text-gray-900 mb-2" htmlFor="userType">
+          Login as
+        </label>
+        <select
+          id="userType"
+          value={userType}
+          onChange={(e) => setUserType(e.target.value as UserType)}
+          className="w-full px-4 py-2 text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          <option value="admin">Admin</option>
+          <option value="employee">Employee</option>
+          <option value="customer">Customer</option>
+        </select>
+      </div>
+
       {error && (
         <div role="alert" className="bg-red-50 text-red-800 px-4 py-2 rounded">
           {error}
@@ -83,21 +143,22 @@ export default function LoginForm() {
 
       <div>
         <label className="block text-gray-900 mb-2" htmlFor="username">
-          Username
+          {userType === "admin" ? "Username" : "Email"}
         </label>
         <input
           ref={usernameRef}
           className={`w-full px-4 py-2 text-gray-900 placeholder-gray-400 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 ${
             fieldErrors.username ? "border-red-400" : "border-gray-300"
           }`}
-          type="text"
+          type={userType === "admin" ? "text" : "email"}
           name="username"
           id="username"
-          autoComplete="username"
+          autoComplete={userType === "admin" ? "username" : "email"}
           aria-invalid={!!fieldErrors.username}
           aria-describedby={fieldErrors.username ? "username-error" : undefined}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          placeholder={userType === "admin" ? "Enter username" : "Enter email"}
         />
         {fieldErrors.username && (
           <p id="username-error" className="text-sm text-red-600 mt-1">

@@ -4,13 +4,20 @@ import bcrypt from "bcryptjs";
 import { signToken } from "@/lib/auth";
 
 export const POST = async (request: Request) => {
-  const { username, password } = await request.json();
+  const { email, password } = await request.json();
+
+  if (!email || !password) {
+    return NextResponse.json(
+      { message: "Email and password are required" },
+      { status: 400 }
+    );
+  }
 
   const connection = await createConnection();
 
   const [rows]: any = await connection.execute(
-    "SELECT * FROM admin WHERE AdminName = ?",
-    [username]
+    "SELECT * FROM employees WHERE email = ? AND status = 'active'",
+    [email]
   );
 
   if (!Array.isArray(rows) || rows.length === 0) {
@@ -20,10 +27,10 @@ export const POST = async (request: Request) => {
     );
   }
 
-  const admin = rows[0];
+  const employee = rows[0];
 
-  // compare password - assumes admin.password is a bcrypt hash
-  const ok = await bcrypt.compare(password, admin.password);
+  // compare password with bcrypt hash
+  const ok = await bcrypt.compare(password, employee.password_hash);
   if (!ok)
     return NextResponse.json(
       { message: "Invalid credentials" },
@@ -31,12 +38,15 @@ export const POST = async (request: Request) => {
     );
 
   const token = signToken({
-    id: admin.id,
-    name: admin.AdminName,
-    role: "admin",
+    id: employee.id,
+    name: employee.name,
+    role: "employee",
+    employeeRole: employee.role,
+    email: employee.email,
   });
+
   const res = NextResponse.json({ message: "Login successful" });
-  // set HttpOnly cookie
-  res.cookies.set("token", token, { httpOnly: true, path: "/" });
+  // set HttpOnly cookie for employee
+  res.cookies.set("employee_token", token, { httpOnly: true, path: "/" });
   return res;
 };

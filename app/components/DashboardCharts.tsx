@@ -1,10 +1,25 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+type SeriesPoint = { day: number; value: number };
 
 export default function DashboardCharts() {
-  // Placeholder effect for mounting client-only chart libs later
+  const [sales, setSales] = useState<SeriesPoint[]>([]);
+  const [orders, setOrders] = useState<SeriesPoint[]>([]);
+
   useEffect(() => {
-    // e.g., initialize chart library here
+    let mounted = true;
+    fetch("/api/reports/charts")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!mounted) return;
+        setSales(data.sales || []);
+        setOrders(data.orders || []);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
@@ -13,16 +28,32 @@ export default function DashboardCharts() {
         <h3 className="text-lg font-semibold mb-2 text-gray-900">
           Sales (Last 30 days)
         </h3>
-        <div className="flex-1 flex items-center justify-center text-sm text-gray-500">
-          Chart placeholder
+        <div className="text-sm text-gray-500">
+          {sales.length === 0 ? (
+            <div className="py-10 text-center">Loading...</div>
+          ) : (
+            <ol className="list-decimal list-inside text-xs max-h-40 overflow-auto">
+              {sales.map((s) => (
+                <li key={s.day}>{`Day ${s.day}: ${s.value}`}</li>
+              ))}
+            </ol>
+          )}
         </div>
       </div>
       <div className="bg-white p-4 rounded shadow min-h-[220px]">
         <h3 className="text-lg font-semibold mb-2 text-gray-900">
-          Orders & Fulfillment
+          Orders (Last 30 days)
         </h3>
-        <div className="flex-1 flex items-center justify-center text-sm text-gray-500">
-          Chart placeholder
+        <div className="text-sm text-gray-500">
+          {orders.length === 0 ? (
+            <div className="py-10 text-center">Loading...</div>
+          ) : (
+            <ol className="list-decimal list-inside text-xs max-h-40 overflow-auto">
+              {orders.map((s) => (
+                <li key={s.day}>{`Day ${s.day}: ${s.value}`}</li>
+              ))}
+            </ol>
+          )}
         </div>
       </div>
     </div>
