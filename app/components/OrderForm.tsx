@@ -177,6 +177,14 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
       return;
     }
 
+    if (
+      !orderData.delivery_address ||
+      orderData.delivery_address.trim() === ""
+    ) {
+      setError("Delivery address is required");
+      return;
+    }
+
     setError("");
     setSuccess("");
     setLoading(true);
@@ -192,7 +200,7 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
             quantity: item.quantity,
           })),
           payment_method: orderData.payment_method,
-          delivery_address: orderData.delivery_address || null,
+          delivery_address: orderData.delivery_address, // Now required
           notes: orderData.notes || null,
         }),
       });
@@ -448,7 +456,7 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Delivery Address (Optional)
+                        Delivery Address <span className="text-red-500">*</span>
                       </label>
                       <textarea
                         value={orderData.delivery_address}
@@ -460,7 +468,8 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
-                        placeholder="Enter delivery address if needed"
+                        placeholder="Enter delivery address (required)"
+                        required
                       />
                     </div>
 

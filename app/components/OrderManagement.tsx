@@ -31,21 +31,31 @@ type Order = {
   items?: OrderItem[];
 };
 
+type Employee = {
+  id: number;
+  name: string;
+  role: string;
+  email?: string;
+  phone?: string;
+};
+
 type Props = {
   onSaved?: () => void;
 };
 
 export default function OrderManagement({ onSaved }: Props) {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<
     "all" | "pending" | "confirmed" | "processing" | "completed" | "cancelled"
-  >("all");
+  >("pending"); // Start with pending orders for admin focus
 
   // Order update states
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [updateData, setUpdateData] = useState({
     status: "pending" as Order["status"],
     employee_id: "",
@@ -68,6 +78,19 @@ export default function OrderManagement({ onSaved }: Props) {
     }
   };
 
+  const loadEmployees = async () => {
+    try {
+      const res = await fetch("/api/employees");
+      const data = await res.json();
+
+      if (data.data) {
+        setEmployees(data.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to load employees:", err);
+    }
+  };
+
   const loadOrderDetails = async (orderId: number) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`);
@@ -83,6 +106,7 @@ export default function OrderManagement({ onSaved }: Props) {
 
   useEffect(() => {
     loadOrders();
+    loadEmployees();
   }, [filter]);
 
   const handleUpdateOrder = async (e: React.FormEvent) => {
@@ -147,6 +171,51 @@ export default function OrderManagement({ onSaved }: Props) {
       notes: order.notes || "",
     });
     setShowUpdateModal(true);
+  };
+
+  const openConfirmModal = (order: Order) => {
+    setSelectedOrder(order);
+    setUpdateData({
+      status: "confirmed",
+      employee_id: "",
+      delivery_date: "",
+      notes: order.notes || "",
+    });
+    setShowConfirmModal(true);
+  };
+
+  const handleQuickConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrder || !updateData.employee_id) {
+      setError("Please select an employee to assign the order");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/orders/${selectedOrder.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to confirm order");
+      }
+
+      setShowConfirmModal(false);
+      setSelectedOrder(null);
+      await loadOrders();
+      onSaved?.();
+    } catch (err: any) {
+      setError(err?.message || "Error confirming order");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -290,9 +359,17 @@ export default function OrderManagement({ onSaved }: Props) {
                       >
                         View
                       </button>
+                      {order.status === "pending" && (
+                        <button
+                          onClick={() => openConfirmModal(order)}
+                          className="text-green-600 hover:text-green-900 bg-green-50 px-2 py-1 rounded"
+                        >
+                          Confirm & Assign
+                        </button>
+                      )}
                       <button
                         onClick={() => openUpdateModal(order)}
-                        className="text-green-600 hover:text-green-900"
+                        className="text-indigo-600 hover:text-indigo-900"
                       >
                         Update
                       </button>

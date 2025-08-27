@@ -74,6 +74,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!delivery_address || delivery_address.trim() === "") {
+      return NextResponse.json(
+        { success: false, message: "Delivery address is required" },
+        { status: 400 }
+      );
+    }
+
     const connection = await createConnection();
 
     // Calculate total amount
@@ -107,7 +114,7 @@ export async function POST(request: NextRequest) {
         customer_id,
         totalAmount.toFixed(2),
         payment_method || "cash",
-        delivery_address || null,
+        delivery_address, // Now required, no null fallback
         notes || null,
       ]
     );
