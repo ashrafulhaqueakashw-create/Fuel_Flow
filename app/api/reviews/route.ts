@@ -6,8 +6,10 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const customerId = searchParams.get("customerId");
+    const customerEmail = searchParams.get("customer_email");
     const status = searchParams.get("status");
     const serviceType = searchParams.get("serviceType");
+    const limit = searchParams.get("limit");
 
     const connection = await createConnection();
 
@@ -27,6 +29,11 @@ export async function GET(request: NextRequest) {
     if (customerId) {
       whereConditions.push("r.customer_id = ?");
       params.push(customerId);
+    }
+
+    if (customerEmail) {
+      whereConditions.push("r.customer_email = ?");
+      params.push(customerEmail);
     }
 
     if (status) {
@@ -50,6 +57,12 @@ export async function GET(request: NextRequest) {
         WHERE ${whereConditions.join(" AND ")}
         ORDER BY r.created_at DESC
       `;
+    }
+
+    // Add LIMIT if specified
+    if (limit) {
+      query += ` LIMIT ?`;
+      params.push(parseInt(limit));
     }
 
     const [rows] = await connection.execute(query, params);

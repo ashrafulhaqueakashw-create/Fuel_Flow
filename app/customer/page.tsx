@@ -11,6 +11,8 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "reviews">(
     "dashboard"
   );
+  const [recentReviews, setRecentReviews] = useState<any[]>([]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
   useEffect(() => {
     fetchCustomerProfile();
@@ -24,11 +26,55 @@ export default function CustomerDashboard() {
       }
       const data = await res.json();
       setCustomer(data.customer);
+
+      // Fetch recent reviews after getting customer data
+      if (data.customer?.email) {
+        fetchRecentReviews(data.customer.email);
+        fetchRecentOrders();
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
       router.push("/");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentReviews = async (customerEmail: string) => {
+    try {
+      const res = await fetch(
+        `/api/reviews?customer_email=${encodeURIComponent(
+          customerEmail
+        )}&limit=5`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setRecentReviews(data.data || []);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching recent reviews:", error);
+    }
+  };
+
+  const fetchRecentOrders = async () => {
+    try {
+      const res = await fetch("/api/orders", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          // Get the 5 most recent orders
+          const recentOrdersData = data.data.slice(0, 5);
+          setRecentOrders(recentOrdersData);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching recent orders:", error);
     }
   };
 
@@ -187,18 +233,6 @@ export default function CustomerDashboard() {
                     <h3 className="font-semibold">Leave a Review</h3>
                     <p className="text-sm text-yellow-600">Rate our services</p>
                   </button>
-                  <button className="bg-blue-100 hover:bg-blue-200 text-blue-800 p-4 rounded-lg text-left transition-colors">
-                    <h3 className="font-semibold">View Order History</h3>
-                    <p className="text-sm text-blue-600">
-                      See your past orders
-                    </p>
-                  </button>
-                  <button className="bg-green-100 hover:bg-green-200 text-green-800 p-4 rounded-lg text-left transition-colors">
-                    <h3 className="font-semibold">Current Promotions</h3>
-                    <p className="text-sm text-green-600">
-                      Available discounts
-                    </p>
-                  </button>
                 </div>
               </div>
 
@@ -207,12 +241,153 @@ export default function CustomerDashboard() {
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Recent Activity
                 </h2>
-                <div className="text-gray-600">
-                  <p>No recent activity to display.</p>
-                  <p className="text-sm mt-2">
-                    Your fuel purchases and transactions will appear here.
-                  </p>
-                </div>
+                {recentReviews.length > 0 || recentOrders.length > 0 ? (
+                  <div className="space-y-3">
+                    {/* Recent Orders */}
+                    {recentOrders.slice(0, 3).map((order) => (
+                      <div
+                        key={`order-${order.id}`}
+                        className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg"
+                      >
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-blue-600 text-sm font-semibold">
+                              📦
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-gray-900">
+                              Order #{order.order_number || order.id}
+                            </p>
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                order.status === "delivered" ||
+                                order.status === "completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : order.status === "processing" ||
+                                    order.status === "confirmed"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : order.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : order.status === "cancelled"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {order.status}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {order.order_items?.length || 0} items • Total: $
+                            {order.total_amount
+                              ? Number(order.total_amount).toFixed(2)
+                              : "0.00"}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {new Date(order.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Recent Reviews */}
+                    {recentReviews.slice(0, 2).map((review) => (
+                      <div
+                        key={`review-${review.id}`}
+                        className="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg"
+                      >
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <span className="text-yellow-600 text-sm font-semibold">
+                              ★
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {review.title}
+                            </p>
+                            <div className="flex items-center space-x-1">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={`text-xs ${
+                                    i < review.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {review.service_type?.replace("_", " ")} review
+                            {review.order_number &&
+                              ` • Order #${review.order_number}`}
+                          </p>
+                          <div className="flex items-center justify-between mt-1">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                review.status === "approved"
+                                  ? "bg-green-100 text-green-800"
+                                  : review.status === "rejected"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {/* {review.status} */}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {new Date(review.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex space-x-4 text-center pt-2 border-t">
+                      {recentOrders.length > 3 && (
+                        <button className="flex-1 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                          View all orders →
+                        </button>
+                      )}
+                      {recentReviews.length > 2 && (
+                        <button
+                          onClick={() => setActiveTab("reviews")}
+                          className="flex-1 text-yellow-600 hover:text-yellow-800 text-sm font-medium"
+                        >
+                          View all reviews →
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-gray-600">
+                    <p>No recent activity to display.</p>
+                    <p className="text-sm mt-2">
+                      Your recent orders and reviews will appear here.
+                    </p>
+                    <div className="flex space-x-3 mt-3">
+                      <Link
+                        href="/customer/order"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        Place an order →
+                      </Link>
+                      <button
+                        onClick={() => setActiveTab("reviews")}
+                        className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
+                      >
+                        Leave a review →
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
