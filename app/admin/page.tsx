@@ -141,12 +141,6 @@ export default function AdminDashboard() {
                 >
                   Manage Orders
                 </Link>
-                <button
-                  onClick={() => setActiveTab("reviews")}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
-                >
-                  Manage Reviews
-                </button>
               </div>
             </section>
 

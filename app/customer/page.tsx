@@ -3,14 +3,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CustomerReviews from "../components/CustomerReviews";
+import SmartBooking from "../components/SmartBooking";
+import BookingHistory from "../components/BookingHistory";
 
 export default function CustomerDashboard() {
   const router = useRouter();
   const [customer, setCustomer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "reviews">(
-    "dashboard"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "reviews" | "booking" | "bookings"
+  >("dashboard");
   const [recentReviews, setRecentReviews] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
@@ -137,6 +139,26 @@ export default function CustomerDashboard() {
               }`}
             >
               Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab("booking")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "booking"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Smart Booking
+            </button>
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "bookings"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              My Bookings
             </button>
             <button
               onClick={() => setActiveTab("reviews")}
@@ -392,6 +414,16 @@ export default function CustomerDashboard() {
             </div>
           </div>
         )}
+
+        {activeTab === "booking" && (
+          <SmartBooking
+            onBookingComplete={() => setActiveTab("bookings")}
+            customerEmail={customer?.email}
+            customerName={customer?.name}
+          />
+        )}
+
+        {activeTab === "bookings" && <BookingHistory />}
 
         {activeTab === "reviews" && (
           <CustomerReviews
