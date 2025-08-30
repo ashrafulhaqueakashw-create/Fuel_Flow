@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import DashboardCharts from "../components/DashboardCharts";
 import InventorySnapshot from "../components/InventorySnapshot";
 import ReviewManagement from "../components/ReviewManagement";
+import BookingManagement from "../components/BookingManagement";
 import Link from "next/link";
 
 type Summary = {
@@ -22,9 +23,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "reviews">(
-    "dashboard"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "reviews" | "bookings"
+  >("dashboard");
 
   const fetchSummary = async () => {
     try {
@@ -108,6 +109,16 @@ export default function AdminDashboard() {
               }`}
             >
               Customer Reviews
+            </button>
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "bookings"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Booking Management
             </button>
           </nav>
         </section>
@@ -200,6 +211,8 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === "reviews" && <ReviewManagement onSaved={fetchSummary} />}
+
+        {activeTab === "bookings" && <BookingManagement />}
       </div>
     </div>
   );
