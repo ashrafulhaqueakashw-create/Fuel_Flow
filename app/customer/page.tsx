@@ -2,11 +2,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import CustomerReviews from "../components/CustomerReviews";
 
 export default function CustomerDashboard() {
   const router = useRouter();
   const [customer, setCustomer] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "reviews">(
+    "dashboard"
+  );
 
   useEffect(() => {
     fetchCustomerProfile();
@@ -75,107 +79,151 @@ export default function CustomerDashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                My Profile
-              </h2>
-              <div className="space-y-3">
-                <div>
-                  <span className="text-gray-600">Name:</span>
-                  <p className="font-medium text-gray-900">{customer.name}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Email:</span>
-                  <p className="font-medium text-gray-900">{customer.email}</p>
-                </div>
-                <div>
-                  <span className="text-gray-600">Type:</span>
-                  <p className="font-medium text-gray-900 capitalize">
-                    {customer.type}
-                  </p>
-                </div>
-                {customer.company_name && (
-                  <div>
-                    <span className="text-gray-600">Company:</span>
-                    <p className="font-medium text-gray-900">
-                      {customer.company_name}
-                    </p>
-                  </div>
-                )}
-                {customer.phone && (
-                  <div>
-                    <span className="text-gray-600">Phone:</span>
-                    <p className="font-medium text-gray-900">
-                      {customer.phone}
-                    </p>
-                  </div>
-                )}
-                {customer.address && (
-                  <div>
-                    <span className="text-gray-600">Address:</span>
-                    <p className="font-medium text-gray-900">
-                      {customer.address}
-                    </p>
-                  </div>
-                )}
-                <div>
-                  <span className="text-gray-600">Member Since:</span>
-                  <p className="font-medium text-gray-900">
-                    {new Date(customer.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Quick Actions
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Link
-                  href="/customer/order"
-                  className="bg-red-100 hover:bg-red-200 text-red-800 p-4 rounded-lg text-left transition-colors block"
-                >
-                  <h3 className="font-semibold">Place New Order</h3>
-                  <p className="text-sm text-red-600">
-                    Order fuel and products
-                  </p>
-                </Link>
-                <button className="bg-blue-100 hover:bg-blue-200 text-blue-800 p-4 rounded-lg text-left transition-colors">
-                  <h3 className="font-semibold">View Order History</h3>
-                  <p className="text-sm text-blue-600">See your past orders</p>
-                </button>
-                <button className="bg-green-100 hover:bg-green-200 text-green-800 p-4 rounded-lg text-left transition-colors">
-                  <h3 className="font-semibold">Current Promotions</h3>
-                  <p className="text-sm text-green-600">Available discounts</p>
-                </button>
-                <button className="bg-purple-100 hover:bg-purple-200 text-purple-800 p-4 rounded-lg text-left transition-colors">
-                  <h3 className="font-semibold">Loyalty Points</h3>
-                  <p className="text-sm text-purple-600">Check your rewards</p>
-                </button>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Recent Activity
-              </h2>
-              <div className="text-gray-600">
-                <p>No recent activity to display.</p>
-                <p className="text-sm mt-2">
-                  Your fuel purchases and transactions will appear here.
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "dashboard"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab("reviews")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "reviews"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              My Reviews
+            </button>
+          </nav>
         </div>
+
+        {activeTab === "dashboard" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Profile Card */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  My Profile
+                </h2>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-gray-600">Name:</span>
+                    <p className="font-medium text-gray-900">{customer.name}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Email:</span>
+                    <p className="font-medium text-gray-900">
+                      {customer.email}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Type:</span>
+                    <p className="font-medium text-gray-900 capitalize">
+                      {customer.type}
+                    </p>
+                  </div>
+                  {customer.company_name && (
+                    <div>
+                      <span className="text-gray-600">Company:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.company_name}
+                      </p>
+                    </div>
+                  )}
+                  {customer.phone && (
+                    <div>
+                      <span className="text-gray-600">Phone:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.phone}
+                      </p>
+                    </div>
+                  )}
+                  {customer.address && (
+                    <div>
+                      <span className="text-gray-600">Address:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.address}
+                      </p>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-gray-600">Member Since:</span>
+                    <p className="font-medium text-gray-900">
+                      {new Date(customer.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                  Quick Actions
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Link
+                    href="/customer/order"
+                    className="bg-red-100 hover:bg-red-200 text-red-800 p-4 rounded-lg text-left transition-colors block"
+                  >
+                    <h3 className="font-semibold">Place New Order</h3>
+                    <p className="text-sm text-red-600">
+                      Order fuel and products
+                    </p>
+                  </Link>
+                  <button
+                    onClick={() => setActiveTab("reviews")}
+                    className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 p-4 rounded-lg text-left transition-colors"
+                  >
+                    <h3 className="font-semibold">Leave a Review</h3>
+                    <p className="text-sm text-yellow-600">Rate our services</p>
+                  </button>
+                  <button className="bg-blue-100 hover:bg-blue-200 text-blue-800 p-4 rounded-lg text-left transition-colors">
+                    <h3 className="font-semibold">View Order History</h3>
+                    <p className="text-sm text-blue-600">
+                      See your past orders
+                    </p>
+                  </button>
+                  <button className="bg-green-100 hover:bg-green-200 text-green-800 p-4 rounded-lg text-left transition-colors">
+                    <h3 className="font-semibold">Current Promotions</h3>
+                    <p className="text-sm text-green-600">
+                      Available discounts
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Recent Activity
+                </h2>
+                <div className="text-gray-600">
+                  <p>No recent activity to display.</p>
+                  <p className="text-sm mt-2">
+                    Your fuel purchases and transactions will appear here.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "reviews" && (
+          <CustomerReviews
+            customerEmail={customer?.email}
+            customerName={customer?.name}
+          />
+        )}
       </main>
     </div>
   );

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import DashboardCharts from "../components/DashboardCharts";
 import InventorySnapshot from "../components/InventorySnapshot";
+import ReviewManagement from "../components/ReviewManagement";
 import Link from "next/link";
 
 type Summary = {
@@ -21,6 +22,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "reviews">(
+    "dashboard"
+  );
 
   const fetchSummary = async () => {
     try {
@@ -82,88 +86,126 @@ export default function AdminDashboard() {
           )}
         </header>
 
-        {/* Quick Navigation */}
+        {/* Tab Navigation */}
         <section className="mb-8">
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/admin/customers"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "dashboard"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
             >
-              Manage Customers
-            </Link>
-            <Link
-              href="/admin/employees"
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+              Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab("reviews")}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === "reviews"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
             >
-              Manage Employees
-            </Link>
-            <Link
-              href="/admin/inventory"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
-            >
-              Manage Inventory
-            </Link>
-            <Link
-              href="/admin/orders"
-              className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
-            >
-              Manage Orders
-            </Link>
-          </div>
+              Customer Reviews
+            </button>
+          </nav>
         </section>
 
-        {/* Overview cards */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h4 className="text-sm text-gray-500">Staff Present</h4>
-            <p className="text-2xl font-semibold text-gray-900">
-              {summary.staffPresent}
-            </p>
-            <p className="text-xs text-gray-400">Today</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h4 className="text-sm text-gray-500">Working Hours</h4>
-            <p className="text-2xl font-semibold text-gray-900">
-              {summary.workingHours}h
-            </p>
-            <p className="text-xs text-gray-400">This week</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h4 className="text-sm text-gray-500">Open Orders</h4>
-            <p className="text-2xl font-semibold text-gray-900">
-              {summary.openOrders}
-            </p>
-            <p className="text-xs text-gray-400">Needs attention</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <h4 className="text-sm text-gray-500">Low Inventory</h4>
-            <p className="text-2xl font-semibold text-gray-900">
-              {summary.lowStock} items
-            </p>
-            <p className="text-xs text-gray-400">Restock soon</p>
-          </div>
-        </section>
+        {activeTab === "dashboard" && (
+          <>
+            {/* Quick Navigation */}
+            <section className="mb-8">
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  href="/admin/customers"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+                >
+                  Manage Customers
+                </Link>
+                <Link
+                  href="/admin/employees"
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+                >
+                  Manage Employees
+                </Link>
+                <Link
+                  href="/admin/inventory"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+                >
+                  Manage Inventory
+                </Link>
+                <Link
+                  href="/admin/orders"
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+                >
+                  Manage Orders
+                </Link>
+                <button
+                  onClick={() => setActiveTab("reviews")}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-sm"
+                >
+                  Manage Reviews
+                </button>
+              </div>
+            </section>
 
-        {/* Charts */}
-        <section className="mb-8">
-          <DashboardCharts />
-        </section>
+            {/* Overview cards */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h4 className="text-sm text-gray-500">Staff Present</h4>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {summary.staffPresent}
+                </p>
+                <p className="text-xs text-gray-400">Today</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h4 className="text-sm text-gray-500">Working Hours</h4>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {summary.workingHours}h
+                </p>
+                <p className="text-xs text-gray-400">This week</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h4 className="text-sm text-gray-500">Open Orders</h4>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {summary.openOrders}
+                </p>
+                <p className="text-xs text-gray-400">Needs attention</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h4 className="text-sm text-gray-500">Low Inventory</h4>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {summary.lowStock} items
+                </p>
+                <p className="text-xs text-gray-400">Restock soon</p>
+              </div>
+            </section>
 
-        {/* Analysis / Reports */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-4 rounded-lg shadow lg:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
-              Sales Analysis
-            </h3>
-            <p className="text-sm text-gray-600">
-              Revenue trends, top products, and regional performance.
-            </p>
-            <div className="mt-4 text-sm text-gray-500">
-              Report placeholder — integrate charts and real data here.
-            </div>
-          </div>
-          <InventorySnapshot />
-        </section>
+            {/* Charts */}
+            <section className="mb-8">
+              <DashboardCharts />
+            </section>
+
+            {/* Analysis / Reports */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded-lg shadow lg:col-span-2">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Sales Analysis
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Revenue trends, top products, and regional performance.
+                </p>
+                <div className="mt-4 text-sm text-gray-500">
+                  Report placeholder — integrate charts and real data here.
+                </div>
+              </div>
+              <InventorySnapshot />
+            </section>
+          </>
+        )}
+
+        {activeTab === "reviews" && <ReviewManagement onSaved={fetchSummary} />}
       </div>
     </div>
   );
