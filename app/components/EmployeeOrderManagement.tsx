@@ -31,40 +31,37 @@ type Order = {
   items?: OrderItem[];
 };
 
-type Employee = {
-  id: number;
-  name: string;
-  role: string;
-  email?: string;
-  phone?: string;
-};
-
 type Props = {
+  employeeId: number;
   onSaved?: () => void;
 };
 
-export default function OrderManagement({ onSaved }: Props) {
+export default function EmployeeOrderManagement({
+  employeeId,
+  onSaved,
+}: Props) {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [filter, setFilter] = useState<
-    "all" | "pending" | "confirmed" | "processing" | "completed" | "cancelled"
-  >("all"); // Start with pending orders for admin focus
+    "all" | "confirmed" | "processing" | "completed" | "cancelled"
+  >("confirmed"); // Start with confirmed orders for employee focus
 
   // Order update states
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateData, setUpdateData] = useState({
-    status: "pending" as Order["status"],
-    employee_id: "",
+    status: "confirmed" as Order["status"],
     notes: "",
   });
 
   const loadOrders = async () => {
     try {
-      const url =
-        filter === "all" ? "/api/orders" : `/api/orders?status=${filter}`;
+      // Fetch orders assigned to this employee
+      const url = `/api/orders?employeeId=${employeeId}${
+        filter !== "all" ? `&status=${filter}` : ""
+      }`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -76,24 +73,10 @@ export default function OrderManagement({ onSaved }: Props) {
     }
   };
 
-  const loadEmployees = async () => {
-    try {
-      const res = await fetch("/api/employees");
-      const data = await res.json();
-
-      if (data.data) {
-        setEmployees(data.data || []);
-      }
-    } catch (err) {
-      console.error("Failed to load employees:", err);
-    }
-  };
-
   const loadOrderDetails = async (orderId: number) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`);
       const data = await res.json();
-
       if (data.success) {
         setSelectedOrder(data.data);
       }
@@ -104,8 +87,7 @@ export default function OrderManagement({ onSaved }: Props) {
 
   useEffect(() => {
     loadOrders();
-    loadEmployees();
-  }, [filter]);
+  }, [filter, employeeId]);
 
   const handleUpdateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +100,10 @@ export default function OrderManagement({ onSaved }: Props) {
       const res = await fetch(`/api/orders/${selectedOrder.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify({
+          ...updateData,
+          employee_id: employeeId, // Preserve employee assignment
+        }),
       });
 
       const data = await res.json();
@@ -127,8 +112,13 @@ export default function OrderManagement({ onSaved }: Props) {
         throw new Error(data.message || "Failed to update order");
       }
 
+      setSuccessMessage("Order updated successfully!");
       setShowUpdateModal(false);
       setSelectedOrder(null);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+
       await loadOrders();
       onSaved?.();
     } catch (err: any) {
@@ -138,36 +128,20 @@ export default function OrderManagement({ onSaved }: Props) {
     }
   };
 
-  const handleDeleteOrder = async (orderId: number) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this order? This action cannot be undone."
-      )
-    )
-      return;
-
-    try {
-      const res = await fetch(`/api/orders/${orderId}`, { method: "DELETE" });
-      const data = await res.json();
-
-      if (data.success) {
-        await loadOrders();
-      } else {
-        setError(data.message || "Failed to delete order");
-      }
-    } catch (err: any) {
-      setError("Error deleting order");
-    }
-  };
-
   const openUpdateModal = (order: Order) => {
     setSelectedOrder(order);
     setUpdateData({
       status: order.status,
-      employee_id: order.employee_id?.toString() || "",
       notes: order.notes || "",
     });
+    setError(""); // Clear any previous errors
+    setSuccessMessage(""); // Clear any previous success messages
     setShowUpdateModal(true);
+  };
+
+  const formatPrice = (price: number | string) => {
+    const num = typeof price === "string" ? parseFloat(price) : price;
+    return isNaN(num) ? "0.00" : num.toFixed(2);
   };
 
   const getStatusColor = (status: string) => {
@@ -187,18 +161,11 @@ export default function OrderManagement({ onSaved }: Props) {
     }
   };
 
-  const formatPrice = (price: number | string) => {
-    return typeof price === "string"
-      ? parseFloat(price).toFixed(2)
-      : price.toFixed(2);
-  };
-
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-semibold text-gray-900">
-          Order Management
+          My Assigned Orders
         </h3>
         <div className="text-sm text-gray-600">
           Total Orders: {orders.length}
@@ -209,28 +176,29 @@ export default function OrderManagement({ onSaved }: Props) {
         <div className="bg-red-50 text-red-800 px-4 py-2 rounded">{error}</div>
       )}
 
+      {successMessage && (
+        <div className="bg-green-50 text-green-800 px-4 py-2 rounded">
+          {successMessage}
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex space-x-2 flex-wrap">
-        {[
-          "all",
-          "pending",
-          "confirmed",
-          "processing",
-          "completed",
-          "cancelled",
-        ].map((status) => (
-          <button
-            key={status}
-            onClick={() => setFilter(status as any)}
-            className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
-              filter === status
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </button>
-        ))}
+        {["all", "confirmed", "processing", "completed", "cancelled"].map(
+          (status) => (
+            <button
+              key={status}
+              onClick={() => setFilter(status as any)}
+              className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+                filter === status
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </button>
+          )
+        )}
       </div>
 
       {/* Orders List */}
@@ -241,7 +209,7 @@ export default function OrderManagement({ onSaved }: Props) {
 
         {orders.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
-            No orders found for the selected filter.
+            No orders assigned to you for the selected filter.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -311,18 +279,15 @@ export default function OrderManagement({ onSaved }: Props) {
                       >
                         View
                       </button>
-                      <button
-                        onClick={() => openUpdateModal(order)}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        Update
-                      </button>
-                      <button
-                        onClick={() => handleDeleteOrder(order.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
+                      {order.status !== "completed" &&
+                        order.status !== "cancelled" && (
+                          <button
+                            onClick={() => openUpdateModal(order)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            Update
+                          </button>
+                        )}
                     </td>
                   </tr>
                 ))}
@@ -474,7 +439,6 @@ export default function OrderManagement({ onSaved }: Props) {
                     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
-                    <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
                     <option value="completed">Completed</option>
@@ -484,36 +448,14 @@ export default function OrderManagement({ onSaved }: Props) {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Assign Employee
-                  </label>
-                  <select
-                    value={updateData.employee_id}
-                    onChange={(e) =>
-                      setUpdateData({
-                        ...updateData,
-                        employee_id: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select Employee</option>
-                    {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employee.name} - {employee.role}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Notes
+                    Processing Notes
                   </label>
                   <textarea
                     value={updateData.notes}
                     onChange={(e) =>
                       setUpdateData({ ...updateData, notes: e.target.value })
                     }
+                    placeholder="Add notes about order processing, issues, or completion..."
                     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                   />

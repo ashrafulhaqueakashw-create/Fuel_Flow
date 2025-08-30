@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import DashboardCharts from "../components/DashboardCharts";
 import InventorySnapshot from "../components/InventorySnapshot";
 import Link from "next/link";
@@ -10,31 +11,75 @@ type Summary = {
   lowStock: number;
 };
 
-async function getSummary(): Promise<Summary> {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const res = await fetch(`${baseUrl}/api/reports/summary`, {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  } catch (error) {
-    console.error("Failed to fetch summary:", error);
-    return { staffPresent: 0, workingHours: 0, openOrders: 0, lowStock: 0 };
-  }
-}
+export default function AdminDashboard() {
+  const [summary, setSummary] = useState<Summary>({
+    staffPresent: 0,
+    workingHours: 0,
+    openOrders: 0,
+    lowStock: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-export default async function AdminDashboard() {
-  const summary = await getSummary();
+  const fetchSummary = async () => {
+    try {
+      const res = await fetch("/api/reports/summary", {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSummary(data);
+      setLastUpdated(new Date());
+      setError("");
+    } catch (error) {
+      console.error("Failed to fetch summary:", error);
+      setError("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSummary();
+
+    // Auto-refresh every 30 seconds to get real-time updates
+    const interval = setInterval(fetchSummary, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Overview of operations, reports and analytics
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Admin Dashboard
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Overview of operations, reports and analytics
+              </p>
+              {lastUpdated && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Last updated: {lastUpdated.toLocaleTimeString()}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={fetchSummary}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
+            >
+              {loading ? "Refreshing..." : "Refresh Data"}
+            </button>
+          </div>
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 rounded">
+              {error}
+            </div>
+          )}
         </header>
 
         {/* Quick Navigation */}

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import EmployeeOrderManagement from "../components/EmployeeOrderManagement";
 
 type EmployeeData = {
   id: number;
@@ -19,6 +20,10 @@ export default function EmployeeDashboard() {
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [checkInTime, setCheckInTime] = useState<string | null>(null);
+  const [attendanceMessage, setAttendanceMessage] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,7 +45,23 @@ export default function EmployeeDashboard() {
       }
     };
 
+    const fetchAttendanceStatus = async () => {
+      try {
+        const res = await fetch("/api/employee/attendance");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            setIsCheckedIn(data.isCheckedIn);
+            setCheckInTime(data.checkInTime);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch attendance status:", err);
+      }
+    };
+
     fetchProfile();
+    fetchAttendanceStatus();
   }, [router]);
 
   const handleLogout = async () => {
@@ -52,6 +73,40 @@ export default function EmployeeDashboard() {
     } catch (err) {
       // Force redirect even if logout fails
       router.push("/employee-login");
+    }
+  };
+
+  const handleAttendanceToggle = async () => {
+    setAttendanceLoading(true);
+    setAttendanceMessage("");
+
+    try {
+      const res = await fetch("/api/employee/attendance", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (data.action === "checkin") {
+          setIsCheckedIn(true);
+          setCheckInTime(new Date().toISOString());
+          setAttendanceMessage("Successfully checked in!");
+        } else {
+          setIsCheckedIn(false);
+          setCheckInTime(null);
+          setAttendanceMessage("Successfully checked out!");
+        }
+
+        // Clear message after 3 seconds
+        setTimeout(() => setAttendanceMessage(""), 3000);
+      } else {
+        setAttendanceMessage(data.message || "Failed to update attendance");
+      }
+    } catch (err: any) {
+      setAttendanceMessage("Error updating attendance");
+    } finally {
+      setAttendanceLoading(false);
     }
   };
 
@@ -204,17 +259,56 @@ export default function EmployeeDashboard() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Quick Actions
           </h3>
+
+          {/* Attendance Status */}
+          {isCheckedIn && checkInTime && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded">
+              <p className="text-sm text-green-800">
+                ✅ Checked in at {new Date(checkInTime).toLocaleTimeString()}
+              </p>
+            </div>
+          )}
+
+          {attendanceMessage && (
+            <div
+              className={`mb-4 p-3 rounded ${
+                attendanceMessage.includes("Successfully")
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : "bg-red-50 border border-red-200 text-red-800"
+              }`}
+            >
+              {attendanceMessage}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <button className="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 transition-colors">
               View Schedule
             </button>
-            <button className="bg-green-600 text-white px-4 py-3 rounded hover:bg-green-700 transition-colors">
-              Clock In/Out
+            <button
+              onClick={handleAttendanceToggle}
+              disabled={attendanceLoading}
+              className={`px-4 py-3 rounded text-white font-medium transition-colors disabled:opacity-50 ${
+                isCheckedIn
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              {attendanceLoading
+                ? "Processing..."
+                : isCheckedIn
+                ? "Check Out"
+                : "Check In"}
             </button>
             <button className="bg-purple-600 text-white px-4 py-3 rounded hover:bg-purple-700 transition-colors">
               Request Leave
             </button>
           </div>
+        </div>
+
+        {/* Order Management Section */}
+        <div className="bg-white rounded-lg shadow p-6 mt-6">
+          <EmployeeOrderManagement employeeId={employee.id} />
         </div>
       </main>
     </div>

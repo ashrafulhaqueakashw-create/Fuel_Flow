@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const customerId = searchParams.get("customerId");
+    const employeeId = searchParams.get("employeeId");
 
     const connection = await createConnection();
 
@@ -19,30 +20,35 @@ export async function GET(request: NextRequest) {
     `;
     let params: any[] = [];
 
+    // Build WHERE conditions
+    let whereConditions: string[] = [];
+
     if (status && status !== "all") {
-      query = `
-        SELECT o.*, c.name as customer_name, c.email as customer_email,
-               e.name as employee_name
-        FROM orders o
-        LEFT JOIN customers c ON o.customer_id = c.id
-        LEFT JOIN employees e ON o.employee_id = e.id
-        WHERE o.status = ?
-        ORDER BY o.created_at DESC
-      `;
-      params = [status];
+      whereConditions.push("o.status = ?");
+      params.push(status);
     }
 
     if (customerId) {
+      whereConditions.push("o.customer_id = ?");
+      params.push(customerId);
+    }
+
+    if (employeeId) {
+      whereConditions.push("o.employee_id = ?");
+      params.push(employeeId);
+    }
+
+    // Add WHERE clause if any conditions exist
+    if (whereConditions.length > 0) {
       query = `
         SELECT o.*, c.name as customer_name, c.email as customer_email,
                e.name as employee_name
         FROM orders o
         LEFT JOIN customers c ON o.customer_id = c.id
         LEFT JOIN employees e ON o.employee_id = e.id
-        WHERE o.customer_id = ?
+        WHERE ${whereConditions.join(" AND ")}
         ORDER BY o.created_at DESC
       `;
-      params = [customerId];
     }
 
     const [rows] = await connection.execute(query, params);
