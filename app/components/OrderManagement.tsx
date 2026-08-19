@@ -290,7 +290,7 @@ export default function OrderManagement({ onSaved }: Props) {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${formatPrice(order.total_amount)}
+                      Tk{formatPrice(order.total_amount)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -358,7 +358,7 @@ export default function OrderManagement({ onSaved }: Props) {
                     <strong>Email:</strong> {selectedOrder.customer_email}
                   </div>
                   <div>
-                    <strong>Total:</strong> $
+                    <strong>Total:</strong> Tk
                     {formatPrice(selectedOrder.total_amount)}
                   </div>
                   <div>
@@ -422,10 +422,10 @@ export default function OrderManagement({ onSaved }: Props) {
                                 {item.quantity} {item.unit}
                               </td>
                               <td className="px-4 py-2">
-                                ${formatPrice(item.unit_price)}
+                                Tk{formatPrice(item.unit_price)}
                               </td>
                               <td className="px-4 py-2">
-                                ${formatPrice(item.total_price)}
+                                Tk{formatPrice(item.total_price)}
                               </td>
                             </tr>
                           ))}

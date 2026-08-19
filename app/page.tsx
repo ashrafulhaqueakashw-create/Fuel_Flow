@@ -3,8 +3,39 @@ import LoginForm from "./components/LoginForm";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <LoginForm />
+    <div className="relative min-h-screen flex flex-col items-center justify-center bg-gray-950 overflow-hidden px-4">
+      {/* Dynamic Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Floating gradient orb 1 */}
+        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary-600/20 blur-[120px] animate-float-slow" />
+        {/* Floating gradient orb 2 */}
+        <div className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-fuel-orange/15 blur-[120px] animate-float-medium" />
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:24px_24px] opacity-70" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Branding header */}
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-tr from-primary-600 to-fuel-orange shadow-lg mb-3">
+            <span className="text-3xl text-white font-semibold">⚡</span>
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">
+            Fuel<span className="gradient-text-glow font-black">Flow</span>
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Automated Gas Station & Dispatch Console
+          </p>
+        </div>
+
+        {/* Login Form Wrapper */}
+        <div className="glass-panel-dark rounded-3xl p-8 premium-shadow-lg border border-white/10 relative overflow-hidden backdrop-blur-xl">
+          {/* Subtle glow border effect */}
+          <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary-500 via-fuel-orange to-primary-500 opacity-60" />
+          <LoginForm />
+        </div>
+      </div>
     </div>
   );
 }
+

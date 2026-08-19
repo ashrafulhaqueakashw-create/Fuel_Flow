@@ -233,7 +233,7 @@ export default function InventoryForm({ onSaved }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price * ($)
+                Price * (Tk)
               </label>
               <input
                 type="number"
@@ -381,7 +381,7 @@ export default function InventoryForm({ onSaved }: Props) {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      $
+                      Tk
                       {typeof item.price === "string"
                         ? parseFloat(item.price).toFixed(2)
                         : item.price.toFixed(2)}

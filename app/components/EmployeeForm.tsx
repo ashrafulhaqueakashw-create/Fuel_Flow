@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect } from "react";
 
@@ -12,6 +13,7 @@ export default function EmployeeForm({ onSaved }: Props) {
   const [salary, setSalary] = useState<number | "">("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [recent, setRecent] = useState<any[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +52,6 @@ export default function EmployeeForm({ onSaved }: Props) {
     }
   };
 
-  const [recent, setRecent] = useState<any[]>([]);
   const loadRecent = async () => {
     try {
       const r = await fetch("/api/employees");
@@ -58,7 +59,7 @@ export default function EmployeeForm({ onSaved }: Props) {
         const d = await r.json();
         setRecent(d.data || []);
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -66,89 +67,136 @@ export default function EmployeeForm({ onSaved }: Props) {
   }, []);
 
   return (
-    <>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Registration Form */}
       <form
-        className="bg-white p-6 rounded shadow space-y-4"
+        className="bg-white p-6 rounded-3xl border border-gray-100/80 shadow-sm space-y-4 lg:col-span-2 transition-all duration-300 hover:shadow-md"
         onSubmit={handleSubmit}
       >
-        <h3 className="text-lg font-semibold text-gray-900">
-          Register Employee
-        </h3>
-        {error && <div className="text-red-600">{error}</div>}
         <div>
-          <label className="block text-sm text-gray-700">Name</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          <h3 className="text-base font-bold text-gray-800">
+            Register New Staff Account
+          </h3>
+          <p className="text-xs text-gray-500">Configure profile credentials, role designation, and wage rates</p>
         </div>
-        <div>
-          <label className="block text-sm text-gray-700">Role</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          />
+
+        {error && (
+          <div className="bg-red-50 text-red-800 px-4 py-2.5 rounded-xl border border-red-200 text-xs animate-shake">
+            {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Full Name *</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
+              value={name}
+              placeholder="E.g. David Miller"
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Role/Designation *</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
+              value={role}
+              placeholder="E.g. Dispatcher, Inventory Manager"
+              onChange={(e) => setRole(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
+              type="email"
+              value={email}
+              placeholder="E.g. staff@nexusexp.com"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Phone Number</label>
+            <input
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
+              value={phone}
+              placeholder="E.g. +88015..."
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Salary (Tk / Month)</label>
+            <input
+              type="number"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
+              value={salary as any}
+              placeholder="E.g. 45000"
+              onChange={(e) =>
+                setSalary(e.target.value === "" ? "" : Number(e.target.value))
+              }
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">Account Password *</label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
+              value={password}
+              placeholder="Minimum 6 characters"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
         </div>
-        <div>
-          <label className="block text-sm text-gray-700">Email</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700">Phone</label>
-          <input
-            className="w-full px-3 py-2 border rounded"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700">Password</label>
-          <input
-            type="password"
-            className="w-full px-3 py-2 border rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="block text-sm text-gray-700">Salary</label>
-          <input
-            type="number"
-            className="w-full px-3 py-2 border rounded"
-            value={salary as any}
-            onChange={(e) =>
-              setSalary(e.target.value === "" ? "" : Number(e.target.value))
-            }
-          />
-        </div>
-        <div>
+
+        <div className="pt-2">
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider transition-all active:scale-[0.98]"
             disabled={loading}
             type="submit"
           >
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Registering..." : "Register Employee"}
           </button>
         </div>
       </form>
-      {recent.length > 0 && (
-        <div className="mt-4 bg-white p-4 rounded shadow">
-          <h4 className="font-semibold">Recent employees</h4>
-          <ul className="text-sm text-gray-700 mt-2 space-y-1">
+
+      {/* Recent Employees List */}
+      <div className="bg-white p-6 rounded-3xl border border-gray-100/80 shadow-sm lg:col-span-1 transition-all duration-300 hover:shadow-md">
+        <h4 className="text-base font-bold text-gray-800 mb-4">
+          Current Staff Register
+        </h4>
+        {recent.length === 0 ? (
+          <p className="text-xs text-gray-400 py-6 text-center">No employee records found.</p>
+        ) : (
+          <ul className="space-y-3">
             {recent.slice(0, 6).map((e: any) => (
-              <li key={e.id}>
-                {e.name} — {e.role}
+              <li
+                key={e.id}
+                className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl transition-colors hover:bg-gray-100/30"
+              >
+                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">
+                  {e.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-gray-800 truncate">
+                    {e.name}
+                  </p>
+                  <p className="text-[10px] text-gray-400 truncate mt-0.5">
+                    {e.role} • {e.email || "No email"}
+                  </p>
+                </div>
               </li>
             ))}
           </ul>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 }

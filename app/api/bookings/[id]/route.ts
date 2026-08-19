@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify admin authentication (you might want to add admin role check)
@@ -30,7 +30,8 @@ export async function PUT(
       );
     }
 
-    const bookingId = params.id;
+    const { id } = await params;
+    const bookingId = id;
     const body = await request.json();
     const { booking_status, payment_status } = body;
 

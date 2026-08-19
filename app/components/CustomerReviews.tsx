@@ -188,7 +188,7 @@ export default function CustomerReviews({
                       {new Date(order.created_at).toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600">
-                      Total: $
+                      Total: Tk
                       {order.total_amount
                         ? Number(order.total_amount).toFixed(2)
                         : "0.00"}
@@ -214,7 +214,7 @@ export default function CustomerReviews({
                           {item.product_name} x {item.quantity}
                         </span>
                         <span>
-                          ${(Number(item.price) * item.quantity).toFixed(2)}
+                          Tk{(Number(item.price) * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     ))}

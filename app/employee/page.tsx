@@ -71,7 +71,6 @@ export default function EmployeeDashboard() {
         router.push("/");
       }
     } catch (err) {
-      // Force redirect even if logout fails
       router.push("/employee-login");
     }
   };
@@ -98,7 +97,6 @@ export default function EmployeeDashboard() {
           setAttendanceMessage("Successfully checked out!");
         }
 
-        // Clear message after 3 seconds
         setTimeout(() => setAttendanceMessage(""), 3000);
       } else {
         setAttendanceMessage(data.message || "Failed to update attendance");
@@ -114,8 +112,8 @@ export default function EmployeeDashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading your profile...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-gray-500 text-sm">Verifying credentials...</p>
         </div>
       </div>
     );
@@ -123,12 +121,12 @@ export default function EmployeeDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 text-center max-w-sm">
+          <p className="text-red-500 font-semibold mb-4">{error}</p>
           <button
             onClick={() => router.push("/employee-login")}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="w-full py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700"
           >
             Back to Login
           </button>
@@ -140,16 +138,30 @@ export default function EmployeeDashboard() {
   if (!employee) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Employee Dashboard
-          </h1>
+      <header className="bg-slate-900 text-white relative overflow-hidden py-8 px-6 lg:px-8 border-b border-slate-800">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-[50%] -left-[10%] w-[40%] h-[150%] rounded-full bg-emerald-600/10 blur-[100px]" />
+          <div className="absolute -bottom-[50%] -right-[10%] w-[40%] h-[150%] rounded-full bg-fuel-orange/5 blur-[100px]" />
+        </div>
+
+        <div className="max-w-4xl mx-auto flex justify-between items-center relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xl">⚡</span>
+              <h1 className="text-2xl font-black tracking-tight">
+                Fuel<span className="text-fuel-orange font-black">Flow</span>
+              </h1>
+              <span className="text-[10px] font-bold tracking-wider uppercase bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/10">
+                Staff Dashboard
+              </span>
+            </div>
+            <p className="text-sm text-gray-400">Welcome, {employee.name}</p>
+          </div>
           <button
             onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+            className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/5 transition-all duration-200"
           >
             Logout
           </button>
@@ -157,157 +169,139 @@ export default function EmployeeDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
         {/* Welcome Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Welcome, {employee.name}!
-          </h2>
-          <p className="text-gray-600">Role: {employee.role}</p>
+        <div className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all duration-300 hover:shadow-md">
+          <div>
+            <h2 className="text-lg font-bold text-gray-800">
+              Welcome Back, {employee.name}!
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">Role Designation: {employee.role}</p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              {employee.status}
+            </span>
+          </div>
         </div>
 
         {/* Profile Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Personal Information */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm transition-all duration-300 hover:shadow-md">
+            <h3 className="text-base font-bold text-gray-800 mb-5">
               Personal Information
             </h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-gray-500">
+            <div className="space-y-4">
+              <div className="pb-3 border-b border-gray-50">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   Full Name
                 </label>
-                <p className="text-gray-900">{employee.name}</p>
+                <p className="text-sm font-semibold text-gray-800 mt-0.5">{employee.name}</p>
               </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Email
+              <div className="pb-3 border-b border-gray-50">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Email Address
                 </label>
-                <p className="text-gray-900">{employee.email}</p>
+                <p className="text-sm font-semibold text-gray-800 mt-0.5">{employee.email}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                   Phone
                 </label>
-                <p className="text-gray-900">
+                <p className="text-sm font-semibold text-gray-800 mt-0.5">
                   {employee.phone || "Not provided"}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Employee ID
-                </label>
-                <p className="text-gray-900">
-                  EMP-{employee.id.toString().padStart(4, "0")}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Work Information */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm transition-all duration-300 hover:shadow-md">
+            <h3 className="text-base font-bold text-gray-800 mb-5">
               Work Information
             </h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Position
+            <div className="space-y-4">
+              <div className="pb-3 border-b border-gray-50">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Position/Role
                 </label>
-                <p className="text-gray-900">{employee.role}</p>
+                <p className="text-sm font-semibold text-gray-800 mt-0.5">{employee.role}</p>
               </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Hire Date
+              <div className="pb-3 border-b border-gray-50">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Staff ID
                 </label>
-                <p className="text-gray-900">
-                  {new Date(employee.hire_date).toLocaleDateString()}
+                <p className="text-xs font-bold text-gray-700 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-md inline-block mt-0.5">
+                  EMP-{employee.id.toString().padStart(4, "0")}
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">
-                  Status
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Hire Date
                 </label>
-                <span
-                  className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                    employee.status === "active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {employee.status.charAt(0).toUpperCase() +
-                    employee.status.slice(1)}
-                </span>
+                <p className="text-xs font-semibold text-gray-500 mt-0.5">
+                  {new Date(employee.hire_date).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
               </div>
-              {employee.salary && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Salary
-                  </label>
-                  <p className="text-gray-900">
-                    ${employee.salary.toLocaleString()}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow p-6 mt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Quick Actions
+        {/* Attendance Control Panel */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm transition-all duration-300 hover:shadow-md">
+          <h3 className="text-base font-bold text-gray-800 mb-2">
+            Shift Registration
           </h3>
+          <p className="text-xs text-gray-500 mb-6">
+            Register your check-in/out timestamp for dispatch assignment records.
+          </p>
 
-          {/* Attendance Status */}
+          {/* Messages */}
           {isCheckedIn && checkInTime && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded">
-              <p className="text-sm text-green-800">
-                ✅ Checked in at {new Date(checkInTime).toLocaleTimeString()}
-              </p>
+            <div className="mb-5 p-4 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-2xl text-xs font-semibold flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
+              <span>Shift Active: Checked In at {new Date(checkInTime).toLocaleTimeString()}</span>
             </div>
           )}
 
           {attendanceMessage && (
             <div
-              className={`mb-4 p-3 rounded ${
-                attendanceMessage.includes("Successfully")
-                  ? "bg-green-50 border border-green-200 text-green-800"
-                  : "bg-red-50 border border-red-200 text-red-800"
-              }`}
+              className={`mb-5 p-4 rounded-2xl text-xs font-semibold border ${attendanceMessage.includes("Successfully")
+                  ? "bg-green-50 border-green-100 text-green-800"
+                  : "bg-red-50 border-red-100 text-red-800"
+                }`}
             >
               {attendanceMessage}
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <button className="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 transition-colors">
-              View Schedule
-            </button>
+          <div>
             <button
               onClick={handleAttendanceToggle}
               disabled={attendanceLoading}
-              className={`px-4 py-3 rounded text-white font-medium transition-colors disabled:opacity-50 ${
-                isCheckedIn
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-green-600 hover:bg-green-700"
-              }`}
+              className={`w-full max-w-xs py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 ${isCheckedIn
+                  ? "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-red-600/10"
+                  : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-600/10"
+                }`}
             >
               {attendanceLoading
-                ? "Processing..."
+                ? "Recording..."
                 : isCheckedIn
-                ? "Check Out"
-                : "Check In"}
-            </button>
-            <button className="bg-purple-600 text-white px-4 py-3 rounded hover:bg-purple-700 transition-colors">
-              Request Leave
+                  ? "Register Check Out"
+                  : "Register Check In"}
             </button>
           </div>
         </div>
 
         {/* Order Management Section */}
-        <div className="bg-white rounded-lg shadow p-6 mt-6">
+        <div className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm transition-all duration-300 hover:shadow-md">
           <EmployeeOrderManagement employeeId={employee.id} />
         </div>
       </main>

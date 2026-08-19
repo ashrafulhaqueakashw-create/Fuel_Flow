@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ export default function CustomerOrderPage() {
 
   useEffect(() => {
     fetchCustomerProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCustomerProfile = async () => {
@@ -39,64 +41,78 @@ export default function CustomerOrderPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
-        <div className="text-blue-600">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-500 text-sm">Loading ordering terminal...</p>
+        </div>
       </div>
     );
   }
 
   if (!customer) {
     return (
-      <div className="min-h-screen bg-blue-50 flex items-center justify-center">
-        <div className="text-red-600">Customer not found</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-2xl shadow text-center">
+          <p className="text-red-500 font-semibold">Customer record not found</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
-      <header className="bg-blue-600 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold">FuelFlow</h1>
-              <p className="text-blue-200">Order Fuel & Products</p>
+      <header className="bg-slate-900 text-white relative overflow-hidden py-8 px-6 lg:px-8 border-b border-slate-800">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-[50%] -left-[10%] w-[40%] h-[150%] rounded-full bg-primary-600/10 blur-[100px]" />
+          <div className="absolute -bottom-[50%] -right-[10%] w-[40%] h-[150%] rounded-full bg-fuel-orange/5 blur-[100px]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto flex justify-between items-center relative z-10">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xl">⚡</span>
+              <h1 className="text-2xl font-black tracking-tight">
+                Fuel<span className="text-fuel-orange font-black">Flow</span>
+              </h1>
+              <span className="text-[10px] font-bold tracking-wider uppercase bg-primary-500/20 text-primary-300 px-2 py-0.5 rounded-md border border-primary-500/10">
+                Order Terminal
+              </span>
             </div>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => router.push("/customer")}
-                className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition-colors"
-              >
-                Back to Dashboard
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg transition-colors"
-              >
-                Logout
-              </button>
-            </div>
+            <p className="text-sm text-gray-400">Dispatch Request Dispatcher</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/customer")}
+              className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/5 transition-all duration-200"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/5 transition-all duration-200"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Place Your Order
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-1">
+            Place Your Dispatch Order
           </h2>
-          <p className="text-gray-600">
-            Welcome back, {customer.name}! Browse our available items and add
-            them to your cart.
+          <p className="text-sm text-gray-500">
+            Select fuel quantity, products, and input your dispatch/delivery details.
           </p>
         </div>
 
         <OrderForm
           customerId={customer.id}
           onOrderPlaced={() => {
-            // You could show a success message or redirect
             console.log("Order placed successfully!");
           }}
         />

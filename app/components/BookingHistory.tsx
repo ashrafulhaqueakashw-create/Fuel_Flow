@@ -175,7 +175,7 @@ export default function BookingHistory({ onRefresh }: Props) {
                 <div>
                   <p className="text-sm text-gray-500">Price per Liter</p>
                   <p className="font-medium">
-                    ${Number(booking.price_per_liter).toFixed(2)}
+                    Tk{Number(booking.price_per_liter).toFixed(2)}
                   </p>
                 </div>
                 <div>
@@ -189,13 +189,13 @@ export default function BookingHistory({ onRefresh }: Props) {
               <div className="bg-gray-50 p-4 rounded-lg mb-4">
                 <div className="flex justify-between items-center text-sm mb-2">
                   <span>Subtotal:</span>
-                  <span>${Number(booking.total_amount).toFixed(2)}</span>
+                  <span>Tk{Number(booking.total_amount).toFixed(2)}</span>
                 </div>
                 {Number(booking.discount_applied) > 0 && (
                   <div className="flex justify-between items-center text-sm text-green-600 mb-2">
                     <span>Discount ({Number(booking.discount_applied)}%):</span>
                     <span>
-                      -$
+                      -Tk
                       {(
                         (Number(booking.total_amount) *
                           Number(booking.discount_applied)) /
@@ -206,7 +206,7 @@ export default function BookingHistory({ onRefresh }: Props) {
                 )}
                 <div className="flex justify-between items-center font-medium text-lg border-t pt-2">
                   <span>Final Amount:</span>
-                  <span>${Number(booking.final_amount).toFixed(2)}</span>
+                  <span>Tk{Number(booking.final_amount).toFixed(2)}</span>
                 </div>
               </div>
 

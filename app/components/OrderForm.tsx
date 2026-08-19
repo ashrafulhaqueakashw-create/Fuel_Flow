@@ -35,7 +35,6 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
     "all"
   );
 
-  // Order form data
   const [orderData, setOrderData] = useState({
     payment_method: "cash",
     delivery_address: "",
@@ -52,7 +51,6 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
       const data = await res.json();
 
       if (data.success) {
-        // Filter out items with 0 quantity
         const availableItems = (data.data || []).filter(
           (item: InventoryItem) => {
             const qty =
@@ -71,6 +69,7 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
 
   useEffect(() => {
     loadInventory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   const addToCart = (item: InventoryItem, quantity: number) => {
@@ -104,10 +103,10 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
         cart.map((cartItem) =>
           cartItem.inventory_id === item.id
             ? {
-                ...cartItem,
-                quantity: cartItem.quantity + quantity,
-                total: (cartItem.quantity + quantity) * price,
-              }
+              ...cartItem,
+              quantity: cartItem.quantity + quantity,
+              total: (cartItem.quantity + quantity) * price,
+            }
             : cartItem
         )
       );
@@ -200,7 +199,7 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
             quantity: item.quantity,
           })),
           payment_method: orderData.payment_method,
-          delivery_address: orderData.delivery_address, // Now required
+          delivery_address: orderData.delivery_address,
           notes: orderData.notes || null,
         }),
       });
@@ -219,7 +218,6 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
         notes: "",
       });
 
-      // Reload inventory to reflect updated quantities
       await loadInventory();
       onOrderPlaced?.();
     } catch (err: any) {
@@ -237,205 +235,215 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold text-gray-900">Place Order</h3>
-        <div className="text-sm text-gray-600">
-          Cart: {cart.length} items - ${getTotalAmount().toFixed(2)}
-        </div>
-      </div>
-
       {error && (
-        <div className="bg-red-50 text-red-800 px-4 py-2 rounded">{error}</div>
+        <div className="bg-red-50 text-red-800 px-4 py-3 rounded-2xl border border-red-200 text-sm animate-shake">
+          {error}
+        </div>
       )}
 
       {success && (
-        <div className="bg-green-50 text-green-800 px-4 py-2 rounded">
+        <div className="bg-green-50 text-green-800 px-4 py-3 rounded-2xl border border-green-200 text-sm">
           {success}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Available Items */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded shadow">
-            <div className="px-6 py-4 border-b">
-              <h4 className="text-lg font-semibold">Available Items</h4>
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-3xl p-6 border border-gray-100/80 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h4 className="text-base font-bold text-gray-800">
+                  Select Dispatch Items
+                </h4>
+                <p className="text-xs text-gray-500">Filter and add to your cart</p>
+              </div>
 
               {/* Filters */}
-              <div className="flex space-x-2 mt-3">
+              <div className="flex p-1 bg-gray-50 rounded-xl border border-gray-100">
                 {["all", "fuel", "product", "service"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setFilter(cat as any)}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      filter === cat
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${filter === cat
+                        ? "bg-primary-600 text-white shadow-sm"
+                        : "text-gray-500 hover:text-gray-800"
+                      }`}
                   >
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    {cat}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="p-6">
-              {items.length === 0 ? (
-                <div className="text-center text-gray-500">
-                  No items available for the selected category.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {items.map((item) => (
-                    <div key={item.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h5 className="font-medium text-gray-900">
-                          {item.name}
-                        </h5>
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            item.category === "fuel"
-                              ? "bg-blue-100 text-blue-800"
-                              : item.category === "product"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-purple-100 text-purple-800"
-                          }`}
-                        >
-                          {item.category}
-                        </span>
+            {items.length === 0 ? (
+              <div className="text-center text-gray-400 py-12 text-sm">
+                No items available for the selected category.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {items.map((item) => {
+                  const maxQty =
+                    typeof item.quantity === "string"
+                      ? parseInt(item.quantity)
+                      : item.quantity;
+                  return (
+                    <div
+                      key={item.id}
+                      className="border border-gray-100 bg-gray-50/20 hover:bg-white rounded-2xl p-5 transition-all duration-300 hover:shadow-md hover:border-gray-200/80 flex flex-col justify-between group"
+                    >
+                      <div>
+                        <div className="flex justify-between items-start mb-2">
+                          <h5 className="font-bold text-sm text-gray-800 group-hover:text-primary-600 transition-colors">
+                            {item.name}
+                          </h5>
+                          <span
+                            className={`inline-flex px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md border ${item.category === "fuel"
+                                ? "bg-blue-50 text-blue-700 border-blue-200"
+                                : item.category === "product"
+                                  ? "bg-green-50 text-green-700 border-green-200"
+                                  : "bg-purple-50 text-purple-700 border-purple-200"
+                              }`}
+                          >
+                            {item.category}
+                          </span>
+                        </div>
+
+                        {item.description && (
+                          <p className="text-xs text-gray-500 line-clamp-2 mb-4">
+                            {item.description}
+                          </p>
+                        )}
                       </div>
 
-                      {item.description && (
-                        <p className="text-sm text-gray-600 mb-2">
-                          {item.description}
-                        </p>
-                      )}
+                      <div>
+                        <div className="flex justify-between items-baseline mb-4">
+                          <span className="text-base font-extrabold text-gray-800">
+                            Tk {formatPrice(item.price)}
+                            <span className="text-xs font-normal text-gray-400">
+                              {" "}
+                              / {item.unit}
+                            </span>
+                          </span>
+                          <span className="text-[10px] font-bold text-gray-400">
+                            {maxQty} available
+                          </span>
+                        </div>
 
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-lg font-semibold text-gray-900">
-                          ${formatPrice(item.price)} / {item.unit}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {typeof item.quantity === "string"
-                            ? parseInt(item.quantity)
-                            : item.quantity}{" "}
-                          available
-                        </span>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="number"
-                          min="1"
-                          max={
-                            typeof item.quantity === "string"
-                              ? parseInt(item.quantity)
-                              : item.quantity
-                          }
-                          placeholder="Qty"
-                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
-                          onKeyPress={(e) => {
-                            if (e.key === "Enter") {
-                              const qty = parseInt(
-                                (e.target as HTMLInputElement).value
-                              );
+                        {/* Add to Cart Control */}
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="1"
+                            max={maxQty}
+                            placeholder="Qty"
+                            className="w-20 px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 bg-white"
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                const qty = parseInt(
+                                  (e.target as HTMLInputElement).value
+                                );
+                                if (qty > 0) {
+                                  addToCart(item, qty);
+                                  (e.target as HTMLInputElement).value = "";
+                                }
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={(e) => {
+                              const input = (e.target as HTMLButtonElement)
+                                .previousElementSibling as HTMLInputElement;
+                              const qty = parseInt(input.value);
                               if (qty > 0) {
                                 addToCart(item, qty);
-                                (e.target as HTMLInputElement).value = "";
+                                input.value = "";
                               }
-                            }
-                          }}
-                        />
-                        <button
-                          onClick={(e) => {
-                            const input = (e.target as HTMLButtonElement)
-                              .previousElementSibling as HTMLInputElement;
-                            const qty = parseInt(input.value);
-                            if (qty > 0) {
-                              addToCart(item, qty);
-                              input.value = "";
-                            }
-                          }}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
-                        >
-                          Add
-                        </button>
+                            }}
+                            className="flex-1 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2 rounded-xl border border-transparent transition-all active:scale-[0.98]"
+                          >
+                            Add to Cart
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Cart & Order Form */}
+        {/* Shopping Cart & Delivery Checkout */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded shadow">
-            <div className="px-6 py-4 border-b">
-              <h4 className="text-lg font-semibold">Shopping Cart</h4>
+          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm overflow-hidden sticky top-8">
+            <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
+              <h4 className="text-base font-bold text-gray-800">Shopping Cart</h4>
             </div>
 
             <div className="p-6">
               {cart.length === 0 ? (
-                <div className="text-center text-gray-500">
+                <div className="text-center text-gray-400 py-10 text-xs">
                   Your cart is empty
                 </div>
               ) : (
                 <>
-                  <div className="space-y-3 mb-4">
+                  <div className="space-y-3 max-h-60 overflow-y-auto mb-5 pr-1">
                     {cart.map((item) => (
                       <div
                         key={item.inventory_id}
-                        className="flex justify-between items-center p-2 border rounded"
+                        className="flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-2xl"
                       >
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">{item.name}</div>
-                          <div className="text-xs text-gray-500">
-                            ${item.price.toFixed(2)} × {item.quantity}{" "}
+                        <div className="flex-1 pr-2">
+                          <div className="font-semibold text-xs text-gray-800">
+                            {item.name}
+                          </div>
+                          <div className="text-[10px] text-gray-400 mt-0.5">
+                            Tk {item.price.toFixed(2)} × {item.quantity}{" "}
                             {item.unit}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-medium">
-                            ${item.total.toFixed(2)}
+                        <div className="text-right flex items-center gap-2">
+                          <div className="text-xs font-extrabold text-gray-800 pr-1">
+                            Tk {item.total.toFixed(0)}
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) =>
-                                updateCartQuantity(
-                                  item.inventory_id,
-                                  parseInt(e.target.value) || 0
-                                )
-                              }
-                              className="w-12 px-1 py-0 border border-gray-300 rounded text-xs"
-                            />
-                            <button
-                              onClick={() => removeFromCart(item.inventory_id)}
-                              className="text-red-600 hover:text-red-800 text-xs"
-                            >
-                              ✕
-                            </button>
-                          </div>
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateCartQuantity(
+                                item.inventory_id,
+                                parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="w-10 px-1 py-1 border border-gray-200 rounded-lg text-center text-[10px] font-semibold bg-white"
+                          />
+                          <button
+                            onClick={() => removeFromCart(item.inventory_id)}
+                            className="text-red-500 hover:text-red-700 text-sm font-semibold p-1"
+                          >
+                            ✕
+                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-t pt-3 mb-4">
-                    <div className="flex justify-between items-center font-semibold">
-                      <span>Total:</span>
-                      <span>${getTotalAmount().toFixed(2)}</span>
+                  {/* Summary */}
+                  <div className="border-t border-gray-100 pt-4 mb-6">
+                    <div className="flex justify-between items-center font-bold text-sm text-gray-800">
+                      <span>Total Amount:</span>
+                      <span className="text-base font-extrabold text-primary-600">
+                        Tk {getTotalAmount().toFixed(2)}
+                      </span>
                     </div>
                   </div>
 
-                  <form onSubmit={handlePlaceOrder} className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {/* Checkout Form */}
+                  <form onSubmit={handlePlaceOrder} className="space-y-4">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                         Payment Method
                       </label>
                       <select
@@ -446,16 +454,16 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
                             payment_method: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2.5 border border-gray-200 bg-white rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
                       >
-                        <option value="cash">Cash</option>
-                        <option value="card">Card</option>
-                        <option value="mobile">Mobile Payment</option>
+                        <option value="cash">Cash on Delivery</option>
+                        <option value="card">Credit Card</option>
+                        <option value="mobile">Mobile Payment (bKash/Nagad)</option>
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                         Delivery Address <span className="text-red-500">*</span>
                       </label>
                       <textarea
@@ -466,34 +474,34 @@ export default function OrderForm({ customerId, onOrderPlaced }: Props) {
                             delivery_address: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
                         rows={2}
-                        placeholder="Enter delivery address (required)"
+                        placeholder="Enter delivery/dispatch destination..."
                         required
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Notes (Optional)
+                    <div className="space-y-1">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        Dispatch Notes (Optional)
                       </label>
                       <textarea
                         value={orderData.notes}
                         onChange={(e) =>
                           setOrderData({ ...orderData, notes: e.target.value })
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500"
                         rows={2}
-                        placeholder="Special instructions or notes"
+                        placeholder="Instructions for the dispatcher..."
                       />
                     </div>
 
                     <button
                       type="submit"
                       disabled={loading || cart.length === 0}
-                      className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all duration-200 active:scale-[0.98] shadow-lg shadow-primary-600/10 disabled:opacity-50 disabled:pointer-events-none"
                     >
-                      {loading ? "Placing Order..." : "Place Order"}
+                      {loading ? "Registering Dispatch..." : "Confirm & Place Order"}
                     </button>
                   </form>
                 </>

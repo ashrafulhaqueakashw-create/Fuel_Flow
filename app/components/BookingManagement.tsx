@@ -212,7 +212,7 @@ export default function BookingManagement({ onUpdate }: Props) {
                 <div>
                   <p className="text-sm text-gray-500">Final Amount</p>
                   <p className="font-medium">
-                    ${Number(booking.final_amount).toFixed(2)}
+                    Tk{Number(booking.final_amount).toFixed(2)}
                   </p>
                 </div>
               </div>

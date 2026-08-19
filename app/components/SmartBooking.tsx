@@ -254,7 +254,7 @@ export default function SmartBooking({
                     {price.fuel_type}
                   </span>
                   <span className="text-lg font-bold text-blue-600">
-                    ${Number(price.price_per_liter).toFixed(2)}/L
+                    Tk{Number(price.price_per_liter).toFixed(2)}/L
                   </span>
                 </div>
               </div>
@@ -464,7 +464,7 @@ export default function SmartBooking({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>
-                      Subtotal ({bookingForm.quantity_liters}L × $
+                      Subtotal ({bookingForm.quantity_liters}L × Tk
                       {Number(
                         fuelPrices.find(
                           (p) => p.fuel_type === bookingForm.fuel_type
@@ -472,7 +472,7 @@ export default function SmartBooking({
                       ).toFixed(2)}
                       ):
                     </span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>Tk{total.toFixed(2)}</span>
                   </div>
                   {selectedSlot.discount_percentage > 0 && (
                     <div className="flex justify-between text-green-600">
@@ -480,12 +480,12 @@ export default function SmartBooking({
                         Time Slot Discount ({selectedSlot.discount_percentage}
                         %):
                       </span>
-                      <span>-${discount.toFixed(2)}</span>
+                      <span>-Tk{discount.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="border-t pt-2 flex justify-between font-medium text-lg">
                     <span>Total:</span>
-                    <span>${final.toFixed(2)}</span>
+                    <span>Tk{final.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
