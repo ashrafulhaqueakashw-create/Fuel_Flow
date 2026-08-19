@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createConnection } from "../../../../lib/db";
+import { createConnection } from "../../../lib/db";
 import jwt from "jsonwebtoken";
 
 export async function PUT(
@@ -39,7 +39,7 @@ export async function PUT(
 
     // Build dynamic update query based on what fields are provided
     const updates = [];
-    const values = [];
+    const values: any[] = [];
 
     if (booking_status) {
       updates.push("booking_status = ?");

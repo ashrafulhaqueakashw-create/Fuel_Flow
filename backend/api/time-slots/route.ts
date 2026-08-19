@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createConnection } from "../../../lib/db";
+import { createConnection } from "../../lib/db";
 
 export async function GET(request: NextRequest) {
   try {
