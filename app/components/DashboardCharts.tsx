@@ -48,17 +48,17 @@ export default function DashboardCharts() {
 
   // Helpers to render SVG paths
   const getAreaChartPaths = (data: SeriesPoint[], width: number, height: number) => {
-  if (data.length === 0) return { linePath: "", areaPath: "", points: [] };
-  // Ensure we have a valid step size; avoid division by zero when only a single data point exists.
-  const maxVal = Math.max(...data.map((d) => d.value), 1000);
-  const xStep = data.length > 1 ? width / (data.length - 1) : width;
-  const scaleY = (val: number) => height - (val / maxVal) * (height - 30) - 15;
+    if (data.length === 0) return { linePath: "", areaPath: "", points: [] };
+    // Ensure we have a valid step size; avoid division by zero when only a single data point exists.
+    const maxVal = Math.max(...data.map((d) => d.value), 1000);
+    const xStep = data.length > 1 ? width / (data.length - 1) : width;
+    const scaleY = (val: number) => height - (val / maxVal) * (height - 30) - 15;
 
-  const points = data.map((d, i) => ({
-    x: i * xStep,
-    y: scaleY(d.value),
-    item: d,
-  }));
+    const points = data.map((d, i) => ({
+      x: i * xStep,
+      y: scaleY(d.value),
+      item: d,
+    }));
 
 
     // Generate cubic bezier or simple lines
