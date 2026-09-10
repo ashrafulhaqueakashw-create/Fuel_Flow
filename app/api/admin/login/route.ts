@@ -22,8 +22,16 @@ export const POST = async (request: Request) => {
 
   const admin = rows[0];
 
-  // compare password - assumes admin.password is a bcrypt hash
-  const ok = await bcrypt.compare(password, admin.password);
+  // compare password - supports bcrypt hash or direct plain text match
+  let ok = password === admin.password;
+  if (!ok && admin.password) {
+    try {
+      ok = await bcrypt.compare(password, admin.password);
+    } catch {
+      ok = false;
+    }
+  }
+
   if (!ok)
     return NextResponse.json(
       { message: "Invalid credentials" },
@@ -31,7 +39,7 @@ export const POST = async (request: Request) => {
     );
 
   const token = signToken({
-    id: admin.id,
+    id: admin.AdminID || admin.id,
     name: admin.AdminName,
     role: "admin",
   });
