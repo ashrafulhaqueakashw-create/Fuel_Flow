@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createConnection } from "../../../lib/db";
+import { createConnection } from "@/lib/db";
 import jwt from "jsonwebtoken";
 
 export async function PUT(
