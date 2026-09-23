@@ -151,12 +151,24 @@ The `fuelflow` database contains the following relational tables:
   - `≥ 80% capacity` → Peak congestion (regular rate, emergency priority)
 - **Order Pipeline**: `pending` → `confirmed` → `processing` → `delivered` → `cancelled`.
 - **Review Moderation**: Reviews default to `pending` status until approved by an administrator.
+- **Dual-View Mobile Presentation**: Wide administrative tables (Staff & Salaries, Customers) automatically refactor into stacked, tactile card components on mobile screens (`< 768px`), ensuring zero horizontal page blowout and seamless touch interaction.
 
 ---
 
-## ♿ 7. Accessibility & Usability Standards (WCAG 2.1 AA)
+## ♿ 7. Accessibility, Usability & Responsive Design (WCAG 2.1 AA)
 
 FuelFlow adheres strictly to **Web Content Accessibility Guidelines (WCAG) 2.1 Level AA** standards, audited with zero automated failures:
+
+* **📱 Mobile-First Responsiveness & Dual-View Architecture**:
+  * **Dual-View Data Presentation (`md:hidden` vs `hidden md:block`)**:
+    * **Staff & Salaries (`/admin` & `/admin/employees`)**: On mobile devices (`< 768px`, e.g., iPhone 16 at 393px width), employees are rendered as distinct, tactile cards featuring avatar initial, name, role badge, status indicator, a 2-column details grid highlighting **Monthly Salary** (styled in monospace fuel-orange `৳35,000`), phone, and email, alongside 3 stacked full-width action buttons (`Edit / Salary`, `Password`, `Delete`). On desktops (`≥ 768px`), switches to a comprehensive data spreadsheet.
+    * **Customers (`/admin` & `/admin/customers`)**: Mobile displays tactile cards with avatar initials, customer identity, company name, account type badge (`INDIVIDUAL` vs `COMMERCIAL`), email, phone, delivery address, and full-width stacked action buttons (`Edit Profile`, `Password`, `Delete`).
+  * **Viewport Containment & Anti-Blowout Hardening**:
+    * Root page containers, form wrappers, and administrative cards strictly enforce `w-full overflow-x-hidden min-w-0` to eliminate horizontal page expansion and prevent browser side-scroll or auto-zoom bugs on mobile displays down to 320px.
+    * Top announcement bar and control toolbars leverage `flex-wrap gap-2 min-w-0` to ensure flex children never overflow their parents.
+    * Responsive padding scaling: Padding fluidly adapts across breakpoints (`p-4 sm:p-6 lg:p-8`), maximizing screen real estate on phones.
+  * **WCAG 1.4.10 Reflow Compliance**: Content reflows seamlessly without loss of information or functionality, requiring no two-dimensional scrolling down to 320 CSS pixels.
+  * **Touch Target Ergonomics (WCAG 2.5.5 / 2.5.8)**: All interactive buttons, action triggers, and modal buttons feature comfortable minimum 44×44px hit bounds or generous touch padding.
 
 * **Color Contrast Compliance**: Every textual element meets or exceeds the mandatory 4.5:1 ratio:
   * **Primary CTAs & Interactive Buttons**: `#c2410c` (Tailwind `orange-700`) provides **4.76:1** contrast with white text.

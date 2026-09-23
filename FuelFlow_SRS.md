@@ -441,6 +441,9 @@ erDiagram
 
 #### FR-5.1.2 — Customer Management & Password Administration (`/admin/customers`)
 - View paginated list of all customers (id, type, name, company, phone, email, address, registration date).
+- **Dual-View Adaptive Presentation**:
+  - **Desktop View (`≥ 768px`)**: Displays a high-density, horizontal data table (`overflow-x-auto min-w-[700px]`) containing customer identity, type badge (`INDIVIDUAL` vs `COMMERCIAL`), email, phone, truncated delivery address, registration date, and contextual action buttons.
+  - **Mobile Card View (`< 768px`)**: Automatically renders stacked, tactile customer cards (`block md:hidden`). Each card features an avatar initial badge, primary customer name, company indicator, status badge, 2-column contact details grid, delivery address display, and full-width touch-optimized action buttons (`Edit Profile`, `Password`, `Delete`).
 - Register new customers with: type (individual/commercial), name, company name, phone, email, password, address, preferences.
 - Edit existing customer details (name, company, phone, email, address) via `PUT /api/customers/[id]`.
 - **Direct Customer Password Reset**: Admin can reset any customer's password directly from the management console via an interactive modal with salted bcrypt hashing.
@@ -448,6 +451,9 @@ erDiagram
 
 #### FR-5.1.3 — Employee & Salary Management (`/admin/employees`)
 - View complete roster of all employees (id, name, role, email, phone, salary, status, hire date).
+- **Dual-View Adaptive Presentation**:
+  - **Desktop View (`≥ 768px`)**: Displays a comprehensive administrative table (`overflow-x-auto min-w-[700px]`) with employee identifier, role tags, contact information, active employment status, monthly salary in BDT (`৳`), and actions.
+  - **Mobile Card View (`< 768px`)**: Automatically renders touch-friendly employee summary cards (`block md:hidden`). Each card contains avatar monogram, employee name, role badge, staff ID, live status badge (`active`, `inactive`, `on_leave`), a prominent 2-column information panel featuring **Monthly Salary** (highlighted in monospace fuel-orange `৳35,000`), phone, and email, followed by 3 stacked action buttons (`Edit / Salary`, `Password`, `Delete`).
 - Register new employees with: name, role, email, phone, password, salary, and status (`active`, `inactive`, `on_leave`).
 - **Dynamic Salary Management**: Admin can adjust and update employee monthly salaries (`DECIMAL(10,2)`) at any time via `PUT /api/employees/[id]`.
 - **Employment Status & Role Control**: Update roles (`Manager`, `Technician`, `Driver`, `Attendant`) and status (`active`, `inactive`, `on_leave`).
@@ -487,12 +493,14 @@ erDiagram
 - View current admin account username (`AdminName`) and ID.
 - Change admin login username and master password securely with bcrypt encryption (enforces minimum 6 characters).
 
-#### FR-5.1.10 — Unified Modern Design System Integration
+#### FR-5.1.10 — Unified Modern Design System & Mobile Responsiveness
 - The Admin Console, Employee Terminal, and Customer Portal are fully restyled to match the high-trust visual language of the public landing page:
-  - Top emergency hotline & system status announcement bar.
+  - Top emergency hotline & system status announcement bar with responsive wrapping (`flex-wrap gap-2 min-w-0`).
   - Petroleum slate navigation headers (`#0f172a`) with high-contrast badge indicators.
   - Crisp rounded pill navigation tabs with emerald and fuel orange action triggers.
   - Seamless responsive card layouts with zero distracting sci-fi glow.
+  - **Mobile Viewport Hardening (`w-full overflow-x-hidden min-w-0`)**: All page wrappers, administrative cards, and modal dialogs strictly enforce horizontal containment, eliminating accidental viewport expansion, side-scrolling, or browser auto-zoom on compact mobile displays (such as iPhone 16 at 393px width and 320px minimum screens).
+  - **Touch-Friendly Controls**: Interactive elements on mobile provide minimum 44×44px hit areas, generous tap padding, and readable typography (≥14px body text) avoiding micro-touch frustration.
 
 ---
 
@@ -705,7 +713,15 @@ erDiagram
   - Natural, tactile card styling with subtle 1px borders (`border-slate-200`) and soft shadows (`shadow-sm`, `shadow-card`).
   - Zero artificial AI-template neon glow, dark glassmorphic sci-fi gradients, or distracting animations.
 - Clear, readable typography using Geist Sans, Outfit, and Inter font families.
-- Responsive layout supporting seamless viewing from mobile devices (320px) up to ultra-wide displays (4K).
+- **Mobile-First Responsive Architecture & Viewport Hardening**:
+  - Multi-breakpoint coverage supporting seamless rendering from 320px (minimum mobile) through 375px/393px (standard mobile e.g. iPhone 16), 768px (tablets), 1024px (laptops), up to 4K displays.
+  - Viewport containment: Root containers and administrative dashboard cards strictly apply `w-full overflow-x-hidden min-w-0` to eliminate horizontal page expansion and prevent browser side-scroll or auto-zoom bugs.
+  - Responsive padding scaling: Padding fluidly adapts across breakpoints (`p-4 sm:p-6 lg:p-8`), maximizing touch area on compact devices while preserving elegant whitespace on larger monitors.
+  - Grid collapses: Form and summary layouts automatically transition from 2-column or 3-column grids on desktop to clean single-column vertical stacks on mobile (`grid-cols-1 md:grid-cols-2`).
+- **Dual-View Mobile Presentation for Data Tables**:
+  - To solve usability degradation of wide tabular data (>6 columns) on small mobile screens, the system provides a dual-view paradigm:
+    - **Desktop (`≥ 768px`)**: Comprehensive horizontal data table with full spreadsheet inspection.
+    - **Mobile (`< 768px`)**: High-contrast, tactile cards presenting all key fields (salaries, badges, contact details, addresses) with stacked, full-width touch buttons for editing, password resetting, and account deletion.
 - Micro-interactions on buttons, quick-select volume chips, and interactive sliders (`active:scale-[0.98]`).
 
 ### 8.4 Reliability
@@ -719,6 +735,9 @@ erDiagram
 
 ### 8.6 Accessibility & Usability Standards (WCAG 2.1 Level AA)
 - **100% Automated Audit Compliance**: Tested against Google Lighthouse accessibility audits with zero contrast or naming failures.
+- **WCAG 1.4.10 Reflow Compliance**: Content reflows without loss of information or functionality, and without requiring scrolling in two dimensions on screens down to 320 CSS pixels wide (tested on 393px width devices such as iPhone 16).
+- **Target Size & Touch Ergonomics (WCAG 2.5.5 / 2.5.8)**:
+  - All interactive buttons, pill tabs, form controls, and action triggers provide comfortable touch targets (minimum 44×44px or generously padded container) with adequate spacing between adjacent buttons.
 - **Color Contrast Requirements**:
   - All standard text elements meet or exceed the **4.5:1** contrast ratio against their respective background surfaces.
   - Large text (≥ 18pt or bold 14pt) and UI components meet or exceed **3.0:1** contrast.
@@ -794,6 +813,7 @@ npm run dev
 | **BR-16** | Employee Authority: Admin possesses full authority to edit staff salaries (`DECIMAL(10,2)`), roles, statuses (`active`/`inactive`/`on_leave`), and reset staff passwords directly |
 | **BR-17** | Customer Authority: Admin possesses full authority to edit customer details, update addresses, and reset customer passwords directly |
 | **BR-18** | Admin Security: Master administrator can change their login username (`AdminName`) and password (minimum 6 chars, bcrypt-hashed) |
+| **BR-19** | Dual-View Mobile Presentation: Administrative tables automatically adapt into touch-friendly stacked card layouts on screens `< 768px` (WCAG 1.4.10 Reflow) while maintaining desktop data-table inspection |
 
 ---
 
