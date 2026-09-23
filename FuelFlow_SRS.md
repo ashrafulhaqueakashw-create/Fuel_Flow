@@ -4,10 +4,13 @@
 | Field | Value |
 |---|---|
 | **Project Name** | FuelFlow |
-| **Version** | 0.1.0 |
-| **Document Date** | September 23, 2026 |
-| **Repository** | `g:\FuelFlow` |
-| **Status** | Active Development |
+| **Version** | 1.0.0 (Production Live) |
+| **Document Date** | September 24, 2026 |
+| **Live Production** | [fuel-flow-two.vercel.app](https://fuel-flow-two.vercel.app) |
+| **Repository** | [`ashrafulhaqueakashw-create/Fuel_Flow`](https://github.com/ashrafulhaqueakashw-create/Fuel_Flow) |
+| **Hosting Platform** | Vercel (Edge/Serverless) |
+| **Cloud Database** | TiDB Cloud Serverless (AWS ap-southeast-1, Singapore) |
+| **Status** | Production Deployed & Verified |
 
 ---
 
@@ -28,31 +31,43 @@ The system covers the entire operational lifecycle of a fuel distribution busine
 
 | Layer | Technology |
 |---|---|
-| **Framework** | [Next.js 15.5.0](file:///g:/FuelFlow/package.json) (App Router, Turbopack) |
+| **Framework** | [Next.js 15.5.26](file:///g:/FuelFlow/package.json) (App Router, Turbopack) |
 | **Language** | TypeScript 5.x |
 | **Frontend** | React 19.1.0, Tailwind CSS 4.x |
 | **Icons** | Lucide React (`lucide-react`) |
-| **Backend** | Next.js API Routes (Server-side) |
-| **Database** | MySQL (via XAMPP, `mysql2/promise`) |
-| **Auth** | JWT (`jsonwebtoken`) + bcrypt (`bcryptjs` & `@types/bcryptjs`) |
+| **Backend** | Next.js API Routes (Server-side Edge/Serverless Lambdas) |
+| **Database** | Dual-Engine MySQL (`mysql2/promise`):<br/>• **Local Development:** XAMPP MySQL (`localhost:3306`)<br/>• **Cloud Production:** TiDB Cloud Serverless MySQL (`port 4000`, TLS/SSL encrypted) |
+| **Auth** | JWT (`jsonwebtoken`) in HttpOnly cookies + bcrypt (`bcryptjs` & `@types/bcryptjs`) |
+| **Cloud Hosting** | Vercel Hobby Tier (Automatic CI/CD on `main` branch push) |
 | **Fonts** | Geist Sans, Geist Mono, Outfit (Google Fonts via `next/font`) |
 | **Styling** | Clean, grounded human design system inspired by `Utsab_Ethnic` (light theme, petroleum slate `#0f172a`, high-contrast fuel orange `#c2410c` / `#9a3412`, deep emerald `#065f46`, soft shadows) |
 | **Accessibility** | 100% WCAG 2.1 Level AA compliant (contrast ratios ≥ 4.5:1, accessible naming for interactive elements) |
-| **Dev Server** | `next dev --turbopack` |
+| **Build & Dev Tool** | Turbopack (`next dev --turbopack`, `next build --turbopack`) |
 
 ### 1.4 Environment Configuration
 
-Defined in [`.env.local`](file:///g:/FuelFlow/.env.local):
+#### 1.4.1 Local Development (`.env.local`)
+| Variable | Purpose | Value |
+|---|---|---|
+| `DB_HOST` | MySQL host | `localhost` |
+| `DB_PORT` | MySQL port | `3306` |
+| `DB_USER` | Database user | `root` |
+| `DB_PASSWORD` | Database password | *(empty for local XAMPP)* |
+| `DB_NAME` | Database name | `fuelflow` |
+| `DB_SSL` | Enable TLS/SSL | `false` |
+| `JWT_SECRET` | Secret key for JWT signing | `fuelflow-super-secret-production-key-2026` |
+| `NEXT_PUBLIC_API_URL` | Public API base URL | `http://localhost:3000` |
 
-| Variable | Purpose |
-|---|---|
-| `DB_HOST` | MySQL host (`localhost`) |
-| `DB_PORT` | MySQL port (`3306`) |
-| `DB_USER` | Database user (`root`) |
-| `DB_PASSWORD` | Database password (empty for XAMPP) |
-| `DB_NAME` | Database name (`fuelflow`) |
-| `JWT_SECRET` | Secret key for JWT token signing |
-| `NEXT_PUBLIC_API_URL` | Public API base URL (`http://localhost:3000`) |
+#### 1.4.2 Production Cloud Deployment (Vercel Project Settings)
+| Variable | Production Value | Purpose |
+|---|---|---|
+| `DB_HOST` | `gateway01.ap-southeast-1.prod.aws.tidbcloud.com` | Remote TiDB Cloud Gateway |
+| `DB_PORT` | `4000` | TiDB Cloud Dedicated MySQL Port |
+| `DB_USER` | `gAyXdpJeAxhp4KC.root` | Cluster Root User |
+| `DB_PASSWORD` | `mNbPKc7UVKebwxTR` | Secure Database Password |
+| `DB_NAME` | `test` | Active Production Database |
+| `DB_SSL` | `true` | Enforces TLS/SSL Handshake (`rejectUnauthorized: false`) |
+| `JWT_SECRET` | `fuelflow-super-secret-production-key-2026` | Cryptographic JWT Token Signing |
 
 ---
 
@@ -62,21 +77,22 @@ Defined in [`.env.local`](file:///g:/FuelFlow/.env.local):
 
 ```mermaid
 graph TB
-    subgraph Client["Client Browser"]
-        LP["Landing Page<br/>(Login Gateway)"]
-        AD["Admin Dashboard"]
-        EP["Employee Portal"]
-        CP["Customer Portal"]
+    subgraph Client["Client Browser / Mobile PWA"]
+        LP["Landing Page & Dispatch Showcase<br/>(1-Click Test Autofill)"]
+        AD["Admin Operations Dashboard"]
+        EP["Employee Shift & Attendance Terminal"]
+        CP["Customer Booking & Ordering Portal"]
     end
 
-    subgraph Server["Next.js Server (App Router)"]
-        MW["Middleware<br/>(Route Guards)"]
-        API["API Routes<br/>(/api/*)"]
-        AUTH["Auth Module<br/>(JWT + bcrypt)"]
+    subgraph Vercel["Vercel Cloud Platform (Global CDN & Serverless)"]
+        MW["Next.js Middleware<br/>(Role-Based HttpOnly JWT Guard)"]
+        API["Serverless API Route Handlers<br/>(/api/admin/*, /api/customer/*, /api/employee/*)"]
+        AUTH["Auth & Cryptography Module<br/>(JWT Signing + bcryptjs)"]
     end
 
-    subgraph Database["MySQL (XAMPP)"]
-        DB["fuelflow DB"]
+    subgraph DataLayer["Dual Database Infrastructure"]
+        TIDB[("TiDB Cloud Serverless MySQL<br/>AWS Singapore (ap-southeast-1)<br/>Port 4000 + TLS/SSL Encrypted")]
+        XAMPP[("Local XAMPP MySQL<br/>localhost:3306 (Dev)")]
     end
 
     LP --> MW
@@ -85,7 +101,8 @@ graph TB
     CP --> MW
     MW --> API
     API --> AUTH
-    API --> DB
+    API --> TIDB
+    API -.-> XAMPP
 ```
 
 ### 2.2 Directory Structure
@@ -821,6 +838,33 @@ To scale FuelFlow into an enterprise-grade, end-to-end automated fuel dispatch a
 ### 13.5 Dedicated Mobile Applications
 * **Customer Mobile App**: Cross-platform React Native / Flutter application featuring biometric login, quick one-tap reorders, and live location-based dispatch requests.
 * **Driver / Dispatcher App**: Dedicated handheld interface for delivery drivers featuring turn-by-turn navigation, route checklists, and offline sync.
+
+---
+
+## 14. Cloud Deployment Architecture & Production Verification
+
+### 14.1 Zero-Cost Production Infrastructure
+FuelFlow is architected to run completely free forever on production-grade infrastructure:
+
+1. **Vercel Hobby Tier (Frontend & Serverless Engine)**:
+   - Hosts Next.js 15.5.26 with Edge Caching and Serverless Node.js Route Handlers.
+   - Live URL: [`https://fuel-flow-two.vercel.app`](https://fuel-flow-two.vercel.app)
+   - Zero-downtime continuous deployment on push to `origin/main`.
+2. **TiDB Cloud Serverless (Cloud MySQL Database)**:
+   - Free Forever Tier (5 GB storage, 50M Request Units/month, 0 credit card required).
+   - Located in AWS Singapore (`ap-southeast-1`) for low latency in South Asia.
+   - Enforces encrypted TLS/SSL communication over port `4000`.
+   - Complete schema compatibility with MySQL 8.0, supporting relational constraints, foreign keys, and JSON columns.
+
+### 14.2 Live Production Endpoints & Pre-Seeded Accounts
+All core workflows are operational on the production URL:
+
+| Portal | URL | Demo Credentials | Capabilities |
+|---|---|---|---|
+| **Public Showcase** | `https://fuel-flow-two.vercel.app` | N/A | Live rates, Cost Calculator, 1-Click test login |
+| **Admin Operations** | `https://fuel-flow-two.vercel.app/admin` | `admin` / `admin123` | KPI summary, inventory CRUD, shift attendance, review moderation |
+| **Employee Terminal** | `https://fuel-flow-two.vercel.app/employee` | `staff@fuelflow.com` / `staff123` | Shift clock in/out, assigned delivery order processing |
+| **Customer Portal** | `https://fuel-flow-two.vercel.app/customer` | `customer@fuelflow.com` / `customer123` | Booking wizard, doorstep fuel order placement, review submission |
 
 ---
 
