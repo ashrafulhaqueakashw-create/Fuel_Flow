@@ -1,5 +1,5 @@
 "use client";
-import { useState, useId } from "react";
+import { useState, useId, useEffect } from "react";
 import {
   Calculator,
   Truck,
@@ -15,19 +15,51 @@ interface Props {
   initialFuel?: FuelChoice;
 }
 
+const DEFAULT_PRICES: Record<FuelChoice, { name: string; rate: number }> = {
+  petrol: { name: "Octane 95 Super", rate: 130.0 },
+  diesel: { name: "Diesel Ultra-Low Sulfur", rate: 105.0 },
+  premium: { name: "Premium Petrol", rate: 125.0 },
+};
+
 export default function FuelCostCalculator({ initialFuel = "petrol" }: Props) {
   const [fuelType, setFuelType] = useState<FuelChoice>(initialFuel);
   const [quantity, setQuantity] = useState<number>(50);
   const [selectedSlotType, setSelectedSlotType] = useState<"standard" | "offpeak_10" | "offpeak_15">(
     "offpeak_15"
   );
+  const [prices, setPrices] = useState(DEFAULT_PRICES);
   const sliderId = useId();
 
-  const prices: Record<FuelChoice, { name: string; rate: number }> = {
-    petrol: { name: "Octane 95 Super", rate: 130.0 },
-    diesel: { name: "Diesel Ultra-Low Sulfur", rate: 105.0 },
-    premium: { name: "Premium Petrol", rate: 125.0 },
-  };
+  useEffect(() => {
+    const fetchLivePrices = async () => {
+      try {
+        const res = await fetch("/api/fuel-prices", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data)) {
+            setPrices((prev) => {
+              const updated = { ...prev };
+              for (const row of json.data) {
+                const rate = parseFloat(row.price_per_liter);
+                if (row.fuel_type === "gasoline") {
+                  updated.petrol = { ...updated.petrol, rate };
+                } else if (row.fuel_type === "diesel") {
+                  updated.diesel = { ...updated.diesel, rate };
+                } else if (row.fuel_type === "premium") {
+                  updated.premium = { ...updated.premium, rate };
+                }
+              }
+              return updated;
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load calculator prices:", err);
+      }
+    };
+
+    fetchLivePrices();
+  }, []);
 
   const currentFuel = prices[fuelType];
   const baseCost = quantity * currentFuel.rate;

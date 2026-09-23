@@ -4,37 +4,61 @@ import type { EmployeeCreate } from "@/lib/types";
 import bcrypt from "bcryptjs";
 
 export const POST = async (request: Request) => {
-  const body = (await request.json()) as EmployeeCreate;
-  if (!body || !body.name || !body.role || !body.password) {
+  try {
+    const body = (await request.json()) as EmployeeCreate & { status?: string };
+    if (!body || !body.name || !body.role || !body.password) {
+      return NextResponse.json(
+        { message: "Name, role, and password are required" },
+        { status: 400 }
+      );
+    }
+
+    const password_hash = await bcrypt.hash(body.password, 10);
+    const status = body.status || "active";
+
+    const conn = await createConnection();
+    const [result]: any = await conn.execute(
+      `INSERT INTO employees (name, role, email, phone, password_hash, salary, status, hire_date, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), NOW())`,
+      [
+        body.name,
+        body.role,
+        body.email || null,
+        body.phone || null,
+        password_hash,
+        body.salary || null,
+        status,
+      ]
+    );
+    await conn.end();
+
+    return NextResponse.json({
+      success: true,
+      message: "Employee created successfully",
+      id: result.insertId,
+    });
+  } catch (error: any) {
+    console.error("Error creating employee:", error);
     return NextResponse.json(
-      { message: "Missing required fields" },
-      { status: 400 }
+      { message: error.message || "Failed to create employee" },
+      { status: 500 }
     );
   }
-
-  const password_hash = await bcrypt.hash(body.password, 10);
-
-  const conn = await createConnection();
-  const [result] = await conn.execute(
-    `INSERT INTO employees (name, role, email, phone, password_hash, salary, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-    [
-      body.name,
-      body.role,
-      body.email || null,
-      body.phone || null,
-      password_hash,
-      body.salary || null,
-    ]
-  );
-
-  return NextResponse.json({ message: "Employee created", result });
 };
 
-export const GET = async (request: Request) => {
-  const conn = await createConnection();
-  const [rows]: any = await conn.execute(
-    `SELECT id, name, role, email, phone, salary, created_at FROM employees ORDER BY created_at DESC LIMIT 50`
-  );
-  return NextResponse.json({ data: rows });
+export const GET = async () => {
+  try {
+    const conn = await createConnection();
+    const [rows]: any = await conn.execute(
+      `SELECT id, name, role, email, phone, salary, status, hire_date, created_at FROM employees ORDER BY created_at DESC LIMIT 100`
+    );
+    await conn.end();
+    return NextResponse.json({ success: true, data: rows });
+  } catch (error: any) {
+    console.error("Error fetching employees:", error);
+    return NextResponse.json(
+      { success: false, data: [], message: error.message },
+      { status: 500 }
+    );
+  }
 };

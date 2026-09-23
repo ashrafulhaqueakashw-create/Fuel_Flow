@@ -18,10 +18,10 @@ export async function GET(request: NextRequest) {
       LEFT JOIN employees e ON o.employee_id = e.id
       ORDER BY o.created_at DESC
     `;
-    let params: any[] = [];
+    const params: any[] = [];
 
     // Build WHERE conditions
-    let whereConditions: string[] = [];
+    const whereConditions: string[] = [];
 
     if (status && status !== "all") {
       whereConditions.push("o.status = ?");

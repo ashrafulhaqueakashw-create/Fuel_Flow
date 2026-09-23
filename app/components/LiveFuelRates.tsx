@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Fuel,
   CheckCircle,
@@ -85,6 +85,43 @@ interface Props {
 
 export default function LiveFuelRates({ onSelectFuel }: Props) {
   const [selectedId, setSelectedId] = useState("octane-95");
+  const [rates, setRates] = useState<FuelRate[]>(FUEL_RATES);
+
+  // Load real-time fuel prices updated by the Admin
+  useEffect(() => {
+    const fetchLivePrices = async () => {
+      try {
+        const res = await fetch("/api/fuel-prices", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data)) {
+            setRates((prev) =>
+              prev.map((item) => {
+                const found = json.data.find(
+                  (d: any) =>
+                    d.fuel_type?.toLowerCase() === item.category.toLowerCase() ||
+                    (item.category === "gasoline" && d.fuel_type === "gasoline") ||
+                    (item.category === "gas" && d.fuel_type === "cng")
+                );
+                if (found && found.price_per_liter) {
+                  return {
+                    ...item,
+                    price: parseFloat(found.price_per_liter),
+                    change: "Admin Synchronized",
+                  };
+                }
+                return item;
+              })
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load live rates:", err);
+      }
+    };
+
+    fetchLivePrices();
+  }, []);
 
   const handleOrderClick = (fuel: FuelRate) => {
     setSelectedId(fuel.id);
@@ -123,7 +160,7 @@ export default function LiveFuelRates({ onSelectFuel }: Props) {
 
         {/* Rates Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FUEL_RATES.map((fuel) => {
+          {rates.map((fuel) => {
             const isSelected = selectedId === fuel.id;
             return (
               <div

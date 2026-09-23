@@ -15,10 +15,12 @@ For the exhaustive Software Requirements Specification, refer to [`FuelFlow_SRS.
 
 **FuelFlow** is a full-stack web application designed for end-to-end gas station operations, on-demand doorstep fuel dispatch, and intelligent time-slot scheduling. The platform serves four main domains:
 
-1. **Public Landing & Dispatch Showcase (`/`)**: A clean, accessible, human-centered web experience allowing visitors to check live BPC-aligned fuel prices, calculate delivery costs with off-peak discounts, view verified customer reviews, explore station services, and access the portal.
-2. **Admin Operations Console (`/admin`)**: Operational control center for real-time analytics, inventory replenishment, staff attendance, customer records, review moderation, and dispatch tracking.
-3. **Employee Shift & Fulfillment Terminal (`/employee`)**: Shift attendance (check-in/check-out) and assigned fuel delivery fulfillment.
-4. **Customer Self-Service Portal (`/customer`)**: Fuel order placement, congestion-aware smart booking, delivery tracking, and service review submissions.
+1. **Public Landing & Dispatch Showcase (`/`)**: A clean, accessible, human-centered web experience allowing visitors to check live BPC-aligned fuel prices, calculate delivery costs with off-peak discounts, view verified customer reviews, explore station services, and access all portals with 1-click test autofill.
+2. **Admin Operations & Super-Control Console (`/admin`)**: Complete operational authority for real-time fuel price management (Gasoline, Diesel, Premium, CNG), full employee lifecycle control (salaries, roles, statuses, password resets), customer profile & password administration, master admin security credentials, real-time analytics, inventory management, review moderation, and dispatch tracking.
+3. **Employee Shift & Fulfillment Terminal (`/employee`)**: Shift attendance (check-in/check-out) and assigned fuel delivery fulfillment, styled in the unified modern hero theme.
+4. **Customer Self-Service Portal (`/customer`)**: Fuel order placement, congestion-aware smart booking, delivery tracking, and service review submissions, styled in the unified modern hero theme.
+
+> **🎨 Unified Design Language**: All panels (Admin, Employee, and Customer) are designed with the identical high-trust aesthetic of the public landing page: deep Petroleum Slate (`#0f172a`), Fuel Orange (`#c2410c`), Deep Emerald (`#065f46`), tactile card surfaces, and accessible typography.
 
 ---
 
@@ -100,7 +102,10 @@ g:\FuelFlow\
 
 The `fuelflow` database contains the following relational tables:
 
-- **Auth & Accounts**: `admin`, `customers`, `employees`
+- **Auth & Accounts**:
+  - `admin`: Master administrator accounts (`id`, `AdminName`, `password`)
+  - `customers`: Individual and commercial customers (`id`, `type`, `name`, `company_name`, `phone`, `email`, `password`, `address`, `preferences`)
+  - `employees`: Station staff & drivers (`id`, `name`, `role`, `email`, `phone`, `password_hash`, `salary`, `status`, `hire_date`)
 - **Station Operations**:
   - `attendance`: Employee shift registration (`shift_start`, `shift_end`)
   - `inventory_items`: Station fuel products and merchandise
@@ -110,7 +115,7 @@ The `fuelflow` database contains the following relational tables:
   - `reviews`: Customer feedback with ratings and service types
 - **Smart Dispatch & Scheduling**:
   - `time_slots`: 2-hour scheduling blocks with congestion levels (`low`, `medium`, `high`) and discount percentages
-  - `fuel_prices`: Regulated fuel rates per liter (`gasoline`, `diesel`, `premium`)
+  - `fuel_prices`: Regulated & dynamic fuel rates per liter (`gasoline`, `diesel`, `premium`, `cng`, and custom grades)
   - `bookings`: Scheduled fuel delivery requests
 
 ---
@@ -121,17 +126,22 @@ The `fuelflow` database contains the following relational tables:
   * Admin: `token` cookie (8-hour expiration) → Guards `/admin/*`
   * Employee: `employee_token` cookie (8-hour expiration) → Guards `/employee/*`
   * Customer: `customer_token` cookie (24-hour expiration) → Guards `/customer/*`
-* **Password Hashing**: Passwords stored as `bcryptjs` salted hashes.
+* **Password Hashing**: Passwords stored as `bcryptjs` salted hashes (minimum 6 characters enforced).
+* **Admin Super-Control Security**: The Admin possesses full authorization to directly reset employee and customer passwords via interactive modals with salted bcrypt hashing, as well as change their own master administrator credentials.
 * **SQL Injection Protection**: All queries in `lib/db.ts` use parameterized SQL statements.
 * **1-Click Test Autofill**: The login form includes quick-fill chips for instant role testing:
   * **Admin**: `admin` / `admin123`
-  * **Staff**: `staff@fuelflow.com` / `staff123`
-  * **Customer**: `customer@fuelflow.com` / `customer123`
+  * **Staff**: `staff@fuelflow.com` / `password123`
+  * **Customer**: `customer@fuelflow.com` / `password123`
 
 ---
 
 ## 🚀 6. Core Business Rules
 
+- **Dynamic Fuel Pricing**: The Admin can adjust fuel rates (`/api/fuel-prices`) anytime. All price modifications update the database immediately, syncing live with the landing page **Live Fuel Rates** board and **Fuel Cost & Savings Calculator**.
+- **Employee & Salary Administration**: Admin has full authority to edit staff salaries (`DECIMAL(10,2)`), roles, employment statuses (`active`/`inactive`/`on_leave`), and reset staff passwords directly.
+- **Customer Administration**: Admin can edit customer contact info, delivery addresses, and reset customer passwords directly.
+- **Admin Master Credentials**: Admin can update their login username (`AdminName`) and master password securely with bcrypt hashing.
 - **Inventory Auto-Deduction**: Inventory item quantities decrement automatically upon order creation.
 - **Low Stock Threshold**: Flagged when stock falls below **10 units/liters**.
 - **Shift Rule**: Employees are limited to **one active shift check-in per day**.
@@ -239,9 +249,9 @@ You can test all portals directly on [**fuel-flow-two.vercel.app**](https://fuel
 
 | Role | Portal URL | Test Username / Email | Test Password | Capabilities |
 |---|---|---|---|---|
-| **Admin** | [`/admin`](https://fuel-flow-two.vercel.app/admin) | `admin` | `admin123` | Analytics dashboard, inventory CRUD, shift attendance, review moderation |
-| **Employee** | [`/employee`](https://fuel-flow-two.vercel.app/employee) | `staff@fuelflow.com` | `staff123` | Shift clock in/out, assigned order delivery fulfillment |
-| **Customer** | [`/customer`](https://fuel-flow-two.vercel.app/customer) | `customer@fuelflow.com` | `customer123` | Smart booking wizard, doorstep fuel orders, review submissions |
+| **Admin** | [`/admin`](https://fuel-flow-two.vercel.app/admin) | `admin` | `admin123` | Dynamic fuel pricing, employee salaries & passwords, customer passwords, KPI analytics, inventory, reviews, bookings |
+| **Employee** | [`/employee`](https://fuel-flow-two.vercel.app/employee) | `staff@fuelflow.com` | `password123` | Shift clock in/out, assigned order delivery fulfillment |
+| **Customer** | [`/customer`](https://fuel-flow-two.vercel.app/customer) | `customer@fuelflow.com` | `password123` | Smart booking wizard, doorstep fuel orders, review submissions |
 
 *(The login interface on the landing page also features 1-click test autofill chips for each role).*
 

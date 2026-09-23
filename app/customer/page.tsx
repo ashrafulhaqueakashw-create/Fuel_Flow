@@ -3,6 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  Fuel,
+  User,
+  Calendar,
+  Star,
+  Package,
+  Clock,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  LogOut,
+  ArrowRight,
+  Truck,
+  CheckCircle,
+  Building,
+} from "lucide-react";
 import CustomerReviews from "../components/CustomerReviews";
 import SmartBooking from "../components/SmartBooking";
 import BookingHistory from "../components/BookingHistory";
@@ -63,11 +79,7 @@ export default function CustomerDashboard() {
 
   const fetchRecentOrders = async () => {
     try {
-      const res = await fetch("/api/orders", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await fetch("/api/orders");
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -84,17 +96,17 @@ export default function CustomerDashboard() {
     try {
       await fetch("/api/customer/logout", { method: "POST" });
       router.push("/");
-    } catch (error) {
-      console.error("Logout error:", error);
+    } catch {
+      router.push("/");
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-500 text-sm">Synchronizing dashboard...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#c2410c] border-t-transparent mx-auto"></div>
+          <p className="mt-4 text-slate-500 text-xs font-semibold">Synchronizing customer portal...</p>
         </div>
       </div>
     );
@@ -102,12 +114,13 @@ export default function CustomerDashboard() {
 
   if (!customer) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 text-center max-w-sm">
-          <p className="text-red-500 font-semibold">Session verification failed</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white p-7 rounded-2xl shadow-sm border border-slate-200 text-center max-w-sm w-full">
+          <p className="text-rose-600 font-bold text-sm">Session Verification Expired</p>
+          <p className="text-xs text-slate-500 mt-1 mb-4">Please sign in to access your customer orders.</p>
           <button
             onClick={() => router.push("/")}
-            className="mt-4 w-full py-2 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700"
+            className="w-full py-2.5 bg-[#c2410c] hover:bg-[#9a3412] text-white rounded-xl text-xs font-bold transition-colors"
           >
             Return to Login
           </button>
@@ -117,277 +130,294 @@ export default function CustomerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      {/* Header */}
-      <header className="bg-slate-900 text-white relative overflow-hidden py-8 px-6 lg:px-8 border-b border-slate-800">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-[50%] -left-[10%] w-[40%] h-[150%] rounded-full bg-primary-600/10 blur-[100px]" />
-          <div className="absolute -bottom-[50%] -right-[10%] w-[40%] h-[150%] rounded-full bg-fuel-orange/5 blur-[100px]" />
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-orange-100 selection:text-orange-700">
+      {/* ─── TOP ANNOUNCEMENT BAR (MATCHES LANDING PAGE) ─── */}
+      <div className="bg-slate-900 text-white text-xs py-2 px-4 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4 text-slate-300">
+            <span className="flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-orange-400" />
+              <strong className="text-white">Customer Care: 16223</strong> / +880 1800-383535
+            </span>
+            <span className="hidden md:inline text-slate-600">•</span>
+            <span className="hidden md:flex items-center gap-1.5 text-slate-300">
+              <MapPin className="w-3.5 h-3.5 text-orange-400" />
+              Dhaka Metropole Doorstep Delivery
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 text-xs">
+            <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              BSTI Calibrated Flowmeters (99.9% Purity)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── MAIN NAV HEADER (MATCHES LANDING PAGE) ─── */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-[#c2410c] flex items-center justify-center text-white shadow-sm group-hover:bg-[#9a3412] transition-colors">
+                <Fuel className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xl font-bold tracking-tight text-slate-900">
+                    Fuel<span className="text-[#c2410c]">Flow</span>
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200 capitalize">
+                    {customer.type} Customer
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 font-medium">
+                  Welcome, {customer.name}
+                </p>
+              </div>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/customer/order"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#c2410c] hover:bg-[#9a3412] shadow-sm transition-all active:scale-95"
+            >
+              <Truck className="w-3.5 h-3.5" />
+              <span>Place Order</span>
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition-all"
+            >
+              <LogOut className="w-3.5 h-3.5 text-slate-500" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
 
-        <div className="max-w-7xl mx-auto flex justify-between items-center relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-xl">⚡</span>
-              <h1 className="text-2xl font-black tracking-tight">
-                Fuel<span className="text-fuel-orange font-black">Flow</span>
-              </h1>
-              <span className="text-[10px] font-bold tracking-wider uppercase bg-primary-500/20 text-primary-300 px-2 py-0.5 rounded-md border border-primary-500/10">
-                Customer Portal
-              </span>
-            </div>
-            <p className="text-sm text-gray-400">Welcome, {customer.name}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/5 transition-all duration-200"
-          >
-            Logout
-          </button>
+        {/* ─── TAB NAVIGATION BAR ─── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+          <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2.5 no-scrollbar">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                activeTab === "dashboard"
+                  ? "bg-slate-900 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>Overview & Profile</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("booking")}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                activeTab === "booking"
+                  ? "bg-[#c2410c] text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <Clock className="w-4 h-4" />
+              <span>Smart Booking</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                activeTab === "bookings"
+                  ? "bg-slate-900 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              <span>My Booking History</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("reviews")}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                activeTab === "reviews"
+                  ? "bg-slate-900 text-white shadow-sm"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <Star className="w-4 h-4" />
+              <span>My Reviews</span>
+            </button>
+          </nav>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        {/* Tab Navigation */}
-        <section className="mb-8 border-b border-gray-200">
-          <nav className="flex space-x-6">
-            <button
-              onClick={() => setActiveTab("dashboard")}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition-all relative ${activeTab === "dashboard"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab("booking")}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition-all relative ${activeTab === "booking"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-            >
-              Smart Booking
-            </button>
-            <button
-              onClick={() => setActiveTab("bookings")}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition-all relative ${activeTab === "bookings"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-            >
-              My Bookings
-            </button>
-            <button
-              onClick={() => setActiveTab("reviews")}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition-all relative ${activeTab === "reviews"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-            >
-              My Reviews
-            </button>
-          </nav>
-        </section>
-
+      {/* ─── MAIN CONTENT ─── */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
         {activeTab === "dashboard" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Card */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-6 relative overflow-hidden transition-all duration-300 hover:shadow-md">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-primary-50 rounded-full blur-2xl -z-10" />
-                <h2 className="text-base font-bold text-gray-800 mb-5">
-                  My Profile
-                </h2>
-                <div className="space-y-4">
-                  <div className="pb-3.5 border-b border-gray-50">
-                    <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Name</span>
-                    <p className="text-sm font-semibold text-gray-800 mt-0.5">{customer.name}</p>
-                  </div>
-                  <div className="pb-3.5 border-b border-gray-50">
-                    <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Email Address</span>
-                    <p className="text-sm font-semibold text-gray-800 mt-0.5">{customer.email}</p>
-                  </div>
-                  <div className="pb-3.5 border-b border-gray-50">
-                    <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Customer Type</span>
-                    <p className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 bg-primary-50 text-primary-600 rounded-md inline-block mt-1">
-                      {customer.type}
-                    </p>
-                  </div>
-                  {customer.company_name && (
-                    <div className="pb-3.5 border-b border-gray-50">
-                      <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Company Name</span>
-                      <p className="text-sm font-semibold text-gray-800 mt-0.5">{customer.company_name}</p>
-                    </div>
-                  )}
-                  {customer.phone && (
-                    <div className="pb-3.5 border-b border-gray-50">
-                      <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Phone</span>
-                      <p className="text-sm font-semibold text-gray-800 mt-0.5">{customer.phone}</p>
-                    </div>
-                  )}
-                  {customer.address && (
-                    <div className="pb-3.5 border-b border-gray-50">
-                      <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Address</span>
-                      <p className="text-sm font-semibold text-gray-800 mt-0.5">{customer.address}</p>
-                    </div>
-                  )}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
+            {/* Left Profile Card (4 cols) */}
+            <div className="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
+                <div className="w-12 h-12 rounded-2xl bg-orange-100 text-[#c2410c] font-black text-lg flex items-center justify-center">
+                  {customer.name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-slate-900">{customer.name}</h3>
+                  <p className="text-[11px] text-slate-500 font-medium">{customer.email}</p>
+                </div>
+              </div>
+
+              <div className="space-y-3.5 text-xs">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Account Type
+                  </span>
+                  <span className="inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-800 border border-blue-200">
+                    {customer.type}
+                  </span>
+                </div>
+
+                {customer.company_name && (
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Member Since</span>
-                    <p className="text-xs font-semibold text-gray-500 mt-0.5">
-                      {new Date(customer.created_at).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Commercial Entity
+                    </span>
+                    <p className="font-bold text-slate-900 mt-0.5 flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{customer.company_name}</span>
                     </p>
                   </div>
+                )}
+
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Contact Phone
+                  </span>
+                  <p className="font-semibold text-slate-800 mt-0.5">
+                    {customer.phone || "Not specified"}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Default Delivery Address
+                  </span>
+                  <p className="font-medium text-slate-700 mt-0.5 leading-relaxed">
+                    {customer.address || "No address saved"}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    Registered Member Since
+                  </span>
+                  <p className="font-medium text-slate-500 mt-0.5 text-[11px]">
+                    {new Date(customer.created_at).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions & Activity */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Quick Actions */}
-              <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-6 transition-all duration-300 hover:shadow-md">
-                <h2 className="text-base font-bold text-gray-800 mb-5">
-                  Quick Actions
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Link
-                    href="/customer/order"
-                    className="p-5 rounded-2xl bg-gradient-to-tr from-primary-50 to-primary-100/20 border border-primary-100 hover:border-primary-300 hover:bg-primary-100/30 transition-all flex flex-col gap-3 group"
-                  >
-                    <span className="text-2xl">⚡</span>
-                    <div>
-                      <h3 className="font-bold text-sm text-primary-900 group-hover:text-primary-600 transition-colors">
-                        Place New Order
-                      </h3>
-                      <p className="text-xs text-primary-700/80 mt-0.5">
-                        Order fuel or accessory products instantly
-                      </p>
+            {/* Right Activity & Quick Actions (8 cols) */}
+            <div className="lg:col-span-8 space-y-6">
+              {/* Quick Actions Banners */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Link
+                  href="/customer/order"
+                  className="bg-white hover:bg-orange-50/40 border border-slate-200 hover:border-orange-300 p-6 rounded-2xl transition-all shadow-sm flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#c2410c] flex items-center justify-center">
+                      <Truck className="w-5 h-5" />
                     </div>
-                  </Link>
+                    <span className="text-xs font-bold text-[#c2410c] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                      <span>Order Now</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900">Immediate Fuel Dispatch</h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Order bulk diesel, octane, or lubricants with BSTI digital meters
+                    </p>
+                  </div>
+                </Link>
 
-                  <button
-                    onClick={() => setActiveTab("reviews")}
-                    className="p-5 rounded-2xl bg-gradient-to-tr from-amber-50 to-amber-100/20 border border-amber-100 hover:border-amber-300 hover:bg-amber-100/30 text-left transition-all flex flex-col gap-3 group"
-                  >
-                    <span className="text-2xl">★</span>
-                    <div>
-                      <h3 className="font-bold text-sm text-amber-900 group-hover:text-amber-600 transition-colors">
-                        Leave a Review
-                      </h3>
-                      <p className="text-xs text-amber-700/80 mt-0.5">
-                        Rate and share feedback on our dispatcher services
-                      </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("booking")}
+                  className="bg-white hover:bg-orange-50/40 text-left border border-slate-200 hover:border-orange-300 p-6 rounded-2xl transition-all shadow-sm flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                      <Clock className="w-5 h-5" />
                     </div>
-                  </button>
-                </div>
+                    <span className="text-xs font-bold text-emerald-800 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                      <span>Save up to 15%</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900">Smart Off-Peak Booking</h4>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Schedule arrival during off-peak slots for automated time-slot discounts
+                    </p>
+                  </div>
+                </button>
               </div>
 
-              {/* Recent Activity */}
-              <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-6 transition-all duration-300 hover:shadow-md">
-                <h2 className="text-base font-bold text-gray-800 mb-4">
-                  Recent Activity
-                </h2>
-                {recentReviews.length > 0 || recentOrders.length > 0 ? (
-                  <div className="space-y-4">
-                    {/* Recent Orders */}
-                    {recentOrders.slice(0, 3).map((order) => (
-                      <div
-                        key={`order-${order.id}`}
-                        className="flex items-center space-x-4 p-4 bg-gray-50 border border-gray-100 rounded-2xl transition-colors hover:bg-gray-100/50"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center text-lg">
-                          📦
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-bold text-gray-800">
-                              Order #{order.order_number || order.id}
-                            </p>
-                            <span
-                              className={`inline-flex px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md ${order.status === "delivered" || order.status === "completed"
-                                  ? "bg-green-50 text-green-700 border border-green-200"
-                                  : order.status === "processing" || order.status === "confirmed"
-                                    ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                    : order.status === "pending"
-                                      ? "bg-amber-50 text-amber-700 border border-amber-200"
-                                      : "bg-gray-50 text-gray-600 border border-gray-200"
-                                }`}
-                            >
-                              {order.status}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center mt-1">
-                            <p className="text-[11px] text-gray-500">
-                              {order.order_items?.length || 0} Items • Total: Tk {order.total_amount ? Number(order.total_amount).toFixed(2) : "0.00"}
-                            </p>
-                            <p className="text-[10px] text-gray-400">
-                              {new Date(order.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+              {/* Recent Orders & Activity */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-sm space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h4 className="font-bold text-sm text-slate-900">Recent Order Activity</h4>
+                  <Link
+                    href="/customer/order"
+                    className="text-xs font-bold text-[#c2410c] hover:underline"
+                  >
+                    View All Orders →
+                  </Link>
+                </div>
 
-                    {/* Recent Reviews */}
-                    {recentReviews.slice(0, 2).map((review) => (
-                      <div
-                        key={`review-${review.id}`}
-                        className="flex items-center space-x-4 p-4 bg-gray-50 border border-gray-100 rounded-2xl transition-colors hover:bg-gray-100/50"
-                      >
-                        <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg">
-                          ★
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-bold text-gray-800 truncate">
-                              {review.title}
-                            </p>
-                            <div className="flex items-center gap-0.5">
-                              {[...Array(5)].map((_, i) => (
-                                <span
-                                  key={i}
-                                  className={`text-xs ${i < review.rating ? "text-amber-400" : "text-gray-200"
-                                    }`}
-                                >
-                                  ★
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="flex justify-between items-center mt-1">
-                            <p className="text-[11px] text-gray-500 uppercase tracking-wider font-semibold">
-                              {review.service_type?.replace("_", " ")}
-                            </p>
-                            <span className="text-[10px] text-gray-400">
-                              {new Date(review.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                {recentOrders.length === 0 ? (
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    No orders placed yet. Choose &quot;Place Order&quot; above to request fuel delivery.
                   </div>
                 ) : (
-                  <div className="text-center py-6">
-                    <p className="text-sm text-gray-500">No recent activity to display.</p>
-                    <div className="flex justify-center space-x-4 mt-4">
-                      <Link
-                        href="/customer/order"
-                        className="text-primary-600 hover:text-primary-800 text-xs font-semibold"
+                  <div className="space-y-3">
+                    {recentOrders.map((ord: any) => (
+                      <div
+                        key={ord.id}
+                        className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3"
                       >
-                        Place an order →
-                      </Link>
-                      <button
-                        onClick={() => setActiveTab("reviews")}
-                        className="text-amber-600 hover:text-amber-800 text-xs font-semibold"
-                      >
-                        Leave a review →
-                      </button>
-                    </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                            <Package className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-slate-900 font-mono">
+                              Order #{ord.order_number || ord.id}
+                            </p>
+                            <p className="text-[11px] text-slate-500">
+                              {new Date(ord.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="font-bold font-mono text-xs text-slate-900 block">
+                            ৳{ord.total_amount ? Number(ord.total_amount).toFixed(2) : "0.00"}
+                          </span>
+                          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            {ord.status || "confirmed"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -395,8 +425,9 @@ export default function CustomerDashboard() {
           </div>
         )}
 
+        {/* ─── TAB 2: SMART BOOKING ─── */}
         {activeTab === "booking" && (
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-fade-in">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm animate-fade-in">
             <SmartBooking
               onBookingComplete={() => setActiveTab("bookings")}
               customerEmail={customer?.email}
@@ -405,14 +436,16 @@ export default function CustomerDashboard() {
           </div>
         )}
 
+        {/* ─── TAB 3: BOOKINGS HISTORY ─── */}
         {activeTab === "bookings" && (
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-fade-in">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm animate-fade-in">
             <BookingHistory />
           </div>
         )}
 
+        {/* ─── TAB 4: REVIEWS ─── */}
         {activeTab === "reviews" && (
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-fade-in">
+          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm animate-fade-in">
             <CustomerReviews
               customerEmail={customer?.email}
               customerName={customer?.name}

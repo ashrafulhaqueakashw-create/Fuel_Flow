@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
       LEFT JOIN orders o ON r.order_id = o.id
       ORDER BY r.created_at DESC
     `;
-    let params: any[] = [];
+    const params: any[] = [];
 
     // Build WHERE conditions
-    let whereConditions: string[] = [];
+    const whereConditions: string[] = [];
 
     if (customerId) {
       whereConditions.push("r.customer_id = ?");

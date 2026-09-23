@@ -22,10 +22,10 @@ FuelFlow is a **full-stack web application** for managing gas station operations
 ### 1.2 Scope
 The system covers the entire operational lifecycle of a fuel distribution business:
 
-- **Admin Console** — Full operational control, analytics dashboard, employee/customer/inventory management, order tracking, reviews moderation, and booking management.
-- **Employee Portal** — Shift registration (check-in/out), personal profile, and assigned order management with status updates.
-- **Customer Portal** — Self-service dashboard for placing fuel orders, smart booking with time-slot selection, booking history, and submitting service reviews.
-- **Public Landing Page & Dispatch Showcase** — Clean, human, highly engaging public experience featuring live BPC-aligned fuel rates, interactive cost & off-peak savings calculator, congestion scheduling visualizer, station services, customer reviews, FAQ knowledgebase, and unified portal gateway with 1-click test autofill.
+- **Admin Console** — Complete operational super-control: real-time dynamic fuel pricing controller, full employee lifecycle management (salary adjustments, role assignments, status tracking, and direct password resets), customer profile & password administration, master admin security credentials, inventory tracking, order fulfillment, review moderation, and booking management.
+- **Employee Portal** — Shift registration (check-in/out), personal profile, and assigned order management with status updates, styled with the unified modern hero theme.
+- **Customer Portal** — Self-service dashboard for placing fuel orders, smart booking with time-slot selection, booking history, and submitting service reviews, styled with the unified modern hero theme.
+- **Public Landing Page & Unified Portals** — Clean, human, highly engaging public experience featuring live BPC-aligned fuel rates, interactive cost & off-peak savings calculator, congestion scheduling visualizer, station services, customer reviews, FAQ knowledgebase, and unified portal gateway with 1-click test autofill. All portals (Admin, Employee, Customer) share the identical high-trust aesthetic (Petroleum Slate `#0f172a`, Fuel Orange `#c2410c`, Deep Emerald `#065f46`).
 
 ### 1.3 Technology Stack
 
@@ -151,17 +151,18 @@ g:\FuelFlow\
 │   │   ├── BookingManagement.tsx # Admin booking management panel
 │   │   └── BookingHistory.tsx    # Customer booking history list
 │   └── api/                      # API Routes (REST endpoints)
-│       ├── admin/                # Admin endpoints
+│       ├── admin/                # Admin auth, setup, & profile security
 │       ├── customer/             # Customer auth endpoints
 │       ├── employee/             # Employee auth & attendance
-│       ├── customers/            # CRUD for customers
-│       ├── employees/            # CRUD for employees
+│       ├── customers/            # CRUD for customers & password management
+│       ├── employees/            # CRUD for employees, salaries, & passwords
+│       ├── fuel-prices/          # Dynamic fuel price controller (GET, PUT, POST)
 │       ├── inventory/            # CRUD for inventory items
 │       ├── orders/               # CRUD for orders
 │       ├── bookings/             # Booking detail (by ID)
 │       ├── reviews/              # CRUD for reviews
 │       ├── reports/              # Dashboard summary + charts
-│       └── time-slots/           # (placeholder, no active route)
+│       └── time-slots/           # Available scheduling slots
 ├── backend/                      # Extended backend API layer
 │   ├── api/
 │   │   ├── bookings/route.ts     # Full booking CRUD
@@ -338,7 +339,7 @@ erDiagram
 
     fuel_prices {
         int id PK
-        enum fuel_type "gasoline | diesel | premium"
+        varchar fuel_type "gasoline | diesel | premium | cng | custom"
         decimal price_per_liter
         date effective_date
         boolean is_current
@@ -438,15 +439,20 @@ erDiagram
 - Render **sales trend charts** (30-day revenue) and **order volume charts** using canvas-based visualizations.
 - Show an **Inventory Snapshot** widget for quick stock visibility.
 
-#### FR-5.1.2 — Customer Management (`/admin/customers`)
-- View paginated list of all customers (id, type, name, company, phone, email, registration date).
+#### FR-5.1.2 — Customer Management & Password Administration (`/admin/customers`)
+- View paginated list of all customers (id, type, name, company, phone, email, address, registration date).
 - Register new customers with: type (individual/commercial), name, company name, phone, email, password, address, preferences.
-- Password hashing with bcrypt (12 rounds).
+- Edit existing customer details (name, company, phone, email, address) via `PUT /api/customers/[id]`.
+- **Direct Customer Password Reset**: Admin can reset any customer's password directly from the management console via an interactive modal with salted bcrypt hashing.
+- Delete customer accounts (`DELETE /api/customers/[id]`).
 
-#### FR-5.1.3 — Employee Management (`/admin/employees`)
-- View list of all employees (id, name, role, email, phone, salary, registration date).
-- Register new employees with: name, role, email, phone, password, salary.
-- Password hashing with bcrypt (10 rounds).
+#### FR-5.1.3 — Employee & Salary Management (`/admin/employees`)
+- View complete roster of all employees (id, name, role, email, phone, salary, status, hire date).
+- Register new employees with: name, role, email, phone, password, salary, and status (`active`, `inactive`, `on_leave`).
+- **Dynamic Salary Management**: Admin can adjust and update employee monthly salaries (`DECIMAL(10,2)`) at any time via `PUT /api/employees/[id]`.
+- **Employment Status & Role Control**: Update roles (`Manager`, `Technician`, `Driver`, `Attendant`) and status (`active`, `inactive`, `on_leave`).
+- **Direct Staff Password Reset**: Admin can reset any employee's password directly through a secure modal with salted bcrypt hashing.
+- Delete employee records (`DELETE /api/employees/[id]`).
 
 #### FR-5.1.4 — Inventory Management (`/admin/inventory`)
 - View all inventory items with category filtering.
@@ -471,6 +477,22 @@ erDiagram
 - View all fuel delivery bookings.
 - See time slot utilization and congestion levels.
 - Manage booking statuses (confirmed, in-progress, completed, cancelled).
+
+#### FR-5.1.8 — Dynamic Fuel Prices Controller (Admin Tab & `/api/fuel-prices`)
+- Manage regulated and market pump prices for **Octane 95 / Gasoline**, **Diesel**, **Premium Unleaded**, **Compressed Natural Gas (CNG)**, and custom fuel grades.
+- Update price per liter (`DECIMAL(10,2)`), effective date, and active status (`is_current`).
+- **Real-Time Consumer Sync**: Any price modification updates the database immediately, synchronizing the landing page **Live Fuel Rates Board** (`LiveFuelRates.tsx`) and the interactive **Fuel Cost & Savings Calculator** (`FuelCostCalculator.tsx`).
+
+#### FR-5.1.9 — Admin Master Security & Profile Management (Admin Tab & `/api/admin/profile`)
+- View current admin account username (`AdminName`) and ID.
+- Change admin login username and master password securely with bcrypt encryption (enforces minimum 6 characters).
+
+#### FR-5.1.10 — Unified Modern Design System Integration
+- The Admin Console, Employee Terminal, and Customer Portal are fully restyled to match the high-trust visual language of the public landing page:
+  - Top emergency hotline & system status announcement bar.
+  - Petroleum slate navigation headers (`#0f172a`) with high-contrast badge indicators.
+  - Crisp rounded pill navigation tabs with emerald and fuel orange action triggers.
+  - Seamless responsive card layouts with zero distracting sci-fi glow.
 
 ---
 
@@ -550,21 +572,32 @@ erDiagram
 | `POST` | `/api/customer/login` | Customer login (email + password) |
 | `POST` | `/api/customer/logout` | Customer logout (clear cookie) |
 
-### 6.2 Profile APIs
+### 6.2 Profile & Security APIs
 
 | Method | Endpoint | Description |
 |---|---|---|
+| `GET` | `/api/admin/profile` | Get logged-in admin credentials & session status |
+| `PUT` | `/api/admin/profile` | Update admin username & master password (bcrypt hashed) |
 | `GET` | `/api/employee/profile` | Get logged-in employee profile |
 | `GET` | `/api/customer/profile` | Get logged-in customer profile |
 
-### 6.3 Resource CRUD APIs
+### 6.3 Resource CRUD & Management APIs
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/customers` | List all customers (limit 50) |
+| `GET` | `/api/fuel-prices` | Fetch current market fuel rates per liter (`gasoline`, `diesel`, `premium`, `cng`) |
+| `PUT` | `/api/fuel-prices` | Update fuel price per liter and effective date (Admin) |
+| `POST` | `/api/fuel-prices` | Insert new fuel grade rate record (Admin) |
+| `GET` | `/api/customers` | List all customers (limit 50, with addresses) |
 | `POST` | `/api/customers` | Register a new customer |
-| `GET` | `/api/employees` | List all employees (limit 50) |
-| `POST` | `/api/employees` | Register a new employee |
+| `GET` | `/api/customers/[id]` | Fetch single customer record |
+| `PUT` | `/api/customers/[id]` | Update customer profile & reset password directly (bcrypt) |
+| `DELETE` | `/api/customers/[id]` | Remove customer account |
+| `GET` | `/api/employees` | List all employees (including salaries and active status) |
+| `POST` | `/api/employees` | Register a new employee with role, salary, and status |
+| `GET` | `/api/employees/[id]` | Fetch single employee record |
+| `PUT` | `/api/employees/[id]` | Update employee details, salary, status, & reset password (bcrypt) |
+| `DELETE` | `/api/employees/[id]` | Remove employee record |
 | `GET` | `/api/inventory` | List inventory (optional `?category=`) |
 | `POST` | `/api/inventory` | Add inventory item |
 | `PUT` | `/api/inventory/[id]` | Update inventory item |
@@ -755,8 +788,12 @@ npm run dev
 | **BR-10** | Delivery address is **required** for all orders |
 | **BR-11** | Customer passwords require a minimum of **6 characters** |
 | **BR-12** | Time slots are generated in **2-hour blocks** from 8 AM to 6 PM |
-| **BR-13** | Fuel types supported: **Gasoline**, **Diesel**, **Premium** |
+| **BR-13** | Fuel types supported: **Gasoline**, **Diesel**, **Premium**, **CNG**, and dynamic administrator-configured fuel grades |
 | **BR-14** | Admin JWT expires in **8 hours**, Customer JWT in **24 hours** |
+| **BR-15** | Dynamic Fuel Rates: Admin can modify prices anytime; changes sync instantly with landing page cards and calculators |
+| **BR-16** | Employee Authority: Admin possesses full authority to edit staff salaries (`DECIMAL(10,2)`), roles, statuses (`active`/`inactive`/`on_leave`), and reset staff passwords directly |
+| **BR-17** | Customer Authority: Admin possesses full authority to edit customer details, update addresses, and reset customer passwords directly |
+| **BR-18** | Admin Security: Master administrator can change their login username (`AdminName`) and password (minimum 6 chars, bcrypt-hashed) |
 
 ---
 
@@ -862,9 +899,9 @@ All core workflows are operational on the production URL:
 | Portal | URL | Demo Credentials | Capabilities |
 |---|---|---|---|
 | **Public Showcase** | `https://fuel-flow-two.vercel.app` | N/A | Live rates, Cost Calculator, 1-Click test login |
-| **Admin Operations** | `https://fuel-flow-two.vercel.app/admin` | `admin` / `admin123` | KPI summary, inventory CRUD, shift attendance, review moderation |
-| **Employee Terminal** | `https://fuel-flow-two.vercel.app/employee` | `staff@fuelflow.com` / `staff123` | Shift clock in/out, assigned delivery order processing |
-| **Customer Portal** | `https://fuel-flow-two.vercel.app/customer` | `customer@fuelflow.com` / `customer123` | Booking wizard, doorstep fuel order placement, review submission |
+| **Admin Operations** | `https://fuel-flow-two.vercel.app/admin` | `admin` / `admin123` | Dynamic fuel price control, employee salaries & password resets, customer passwords, KPI summary, inventory CRUD, reviews & bookings |
+| **Employee Terminal** | `https://fuel-flow-two.vercel.app/employee` | `staff@fuelflow.com` / `password123` | Shift clock in/out, assigned delivery order processing |
+| **Customer Portal** | `https://fuel-flow-two.vercel.app/customer` | `customer@fuelflow.com` / `password123` | Booking wizard, doorstep fuel order placement, review submission |
 
 ---
 
