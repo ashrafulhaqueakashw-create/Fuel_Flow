@@ -186,10 +186,10 @@ export default function CustomerForm({ onSaved }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start w-full min-w-0">
         {/* Registration Form (5 cols) */}
         <form
-          className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm space-y-4 lg:col-span-5"
+          className="bg-white p-4 sm:p-7 rounded-2xl border border-slate-200 shadow-sm space-y-4 lg:col-span-5 w-full min-w-0"
           onSubmit={handleSubmit}
         >
           <div>
@@ -313,7 +313,7 @@ export default function CustomerForm({ onSaved }: Props) {
         </form>
 
         {/* Current Customers Register (7 cols) */}
-        <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm lg:col-span-7 space-y-4">
+        <div className="bg-white p-4 sm:p-7 rounded-2xl border border-slate-200 shadow-sm lg:col-span-7 space-y-4 w-full min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
             <div>
               <h4 className="text-base font-bold text-slate-900">
@@ -345,17 +345,17 @@ export default function CustomerForm({ onSaved }: Props) {
               {filteredCustomers.map((c: any) => (
                 <div
                   key={c.id}
-                  className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors"
+                  className="p-3 sm:p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors w-full min-w-0"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0">
                       {c.name?.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs font-bold text-slate-900">{c.name}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-xs font-bold text-slate-900 truncate">{c.name}</p>
                         <span
-                          className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded ${
+                          className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded shrink-0 ${
                             c.type === "commercial"
                               ? "bg-purple-100 text-purple-800"
                               : "bg-blue-100 text-blue-800"
@@ -364,13 +364,13 @@ export default function CustomerForm({ onSaved }: Props) {
                           {c.type}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-[11px] text-slate-500 truncate">
                         {c.email} • {c.company_name ? `Corp: ${c.company_name}` : c.phone || "No phone"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 self-end sm:self-center">
+                  <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 w-full sm:w-auto justify-end">
                     <button
                       type="button"
                       onClick={() => setEditingCust(c)}

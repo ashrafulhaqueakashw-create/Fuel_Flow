@@ -558,29 +558,30 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-orange-100 selection:text-orange-700">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-orange-100 selection:text-orange-700 w-full overflow-x-hidden">
       {/* ─── TOP ANNOUNCEMENT BAR (MATCHES LANDING PAGE) ─── */}
-      <div className="bg-slate-900 text-white text-xs py-2 px-4 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4 text-slate-300">
+      <div className="bg-slate-900 text-white text-xs py-2 px-3 sm:px-4 border-b border-slate-800 w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 text-slate-300 flex-wrap">
             <span className="flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-orange-400" />
-              <strong className="text-white">Station Control Hotdesk: 16223</strong> / +880 1800-383535
+              <Phone className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+              <strong className="text-white">Hotdesk: 16223</strong>
+              <span className="hidden sm:inline text-slate-400">/ +880 1800-383535</span>
             </span>
             <span className="hidden md:inline text-slate-600">•</span>
             <span className="hidden md:flex items-center gap-1.5 text-slate-300">
-              <MapPin className="w-3.5 h-3.5 text-orange-400" />
+              <MapPin className="w-3.5 h-3.5 text-orange-400 shrink-0" />
               Dhaka Station Hub & Remote Tank Cloud
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-2 sm:gap-3 text-xs shrink-0">
             <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Super-Admin Authority Active
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+              <span><span className="hidden xs:inline">Super-Admin</span> Active</span>
             </span>
             <span className="hidden sm:inline text-slate-600">•</span>
-            <span className="text-orange-400 font-mono text-[11px]">
+            <span className="text-orange-400 font-mono text-[10px] sm:text-[11px]">
               {lastUpdated ? `Synced: ${lastUpdated.toLocaleTimeString()}` : "Syncing..."}
             </span>
           </div>
@@ -588,30 +589,30 @@ export default function AdminDashboard() {
       </div>
 
       {/* ─── MAIN NAV HEADER (MATCHES LANDING PAGE) ─── */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40 w-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-[#c2410c] flex items-center justify-center text-white shadow-sm group-hover:bg-[#9a3412] transition-colors">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#c2410c] flex items-center justify-center text-white shadow-sm group-hover:bg-[#9a3412] transition-colors shrink-0">
                 <Fuel className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xl font-bold tracking-tight text-slate-900">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">
                     Fuel<span className="text-[#c2410c]">Flow</span>
                   </span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-50 text-[#9a3412] border border-orange-200">
-                    Admin Command Suite
+                    Admin Suite
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-600 font-medium">
+                <p className="text-[10px] sm:text-[11px] text-slate-600 font-medium">
                   Full System, Price & Personnel Control
                 </p>
               </div>
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 ml-auto">
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs text-slate-700">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-semibold">{adminUsername}</span>
@@ -627,15 +628,15 @@ export default function AdminDashboard() {
                 fetchCustomers();
                 showNotification("All consoles refreshed with live database data");
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition-all"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-sm transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
-              <span>Refresh</span>
+              <span className="hidden xs:inline">Refresh</span>
             </button>
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 shadow-sm transition-all active:scale-95"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -644,11 +645,11 @@ export default function AdminDashboard() {
         </div>
 
         {/* ─── TAB NAVIGATION BAR ─── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100">
-          <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2.5 no-scrollbar">
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 border-t border-slate-100 w-full overflow-hidden">
+          <nav className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2.5 no-scrollbar max-w-full">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "dashboard"
                   ? "bg-slate-900 text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -660,7 +661,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => setActiveTab("prices")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "prices"
                   ? "bg-[#c2410c] text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -672,7 +673,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => setActiveTab("employees")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "employees"
                   ? "bg-[#c2410c] text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -684,7 +685,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => setActiveTab("customers")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "customers"
                   ? "bg-[#c2410c] text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -696,7 +697,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => setActiveTab("bookings")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "bookings"
                   ? "bg-slate-900 text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -708,7 +709,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => setActiveTab("reviews")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "reviews"
                   ? "bg-slate-900 text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -720,7 +721,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={() => setActiveTab("credentials")}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                 activeTab === "credentials"
                   ? "bg-slate-900 text-white shadow-sm"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -735,9 +736,9 @@ export default function AdminDashboard() {
 
       {/* ─── NOTIFICATION POPUP ─── */}
       {notifyMsg && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 w-full">
           <div
-            className={`p-4 rounded-2xl flex items-center justify-between text-xs font-semibold shadow-sm border ${
+            className={`p-3.5 sm:p-4 rounded-2xl flex items-center justify-between text-xs font-semibold shadow-sm border ${
               notifyMsg.type === "success"
                 ? "bg-emerald-50 text-emerald-900 border-emerald-200"
                 : "bg-red-50 text-red-900 border-red-200"
@@ -745,15 +746,15 @@ export default function AdminDashboard() {
           >
             <div className="flex items-center gap-2.5">
               {notifyMsg.type === "success" ? (
-                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <AlertCircle className="w-4 h-4 text-red-600" />
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
               )}
-              <span>{notifyMsg.text}</span>
+              <span className="truncate">{notifyMsg.text}</span>
             </div>
             <button
               onClick={() => setNotifyMsg(null)}
-              className="text-slate-400 hover:text-slate-600 font-bold"
+              className="text-slate-400 hover:text-slate-600 font-bold ml-2 shrink-0"
             >
               ✕
             </button>
@@ -762,7 +763,7 @@ export default function AdminDashboard() {
       )}
 
       {/* ─── MAIN CONTENT CONTAINER ─── */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+      <main className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 min-w-0 overflow-hidden">
         {/* ══════════════════════════════════════════════════════════════
             TAB 1: OVERVIEW & ANALYTICS
         ══════════════════════════════════════════════════════════════ */}
@@ -1085,15 +1086,15 @@ export default function AdminDashboard() {
             TAB 3: EMPLOYEES & SALARIES (USER EXPLICIT REQUEST)
         ══════════════════════════════════════════════════════════════ */}
         {activeTab === "employees" && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+          <div className="space-y-6 animate-fade-in w-full min-w-0">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm w-full min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 mb-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-600" />
                     Staff Operations & Wage Console
                   </div>
-                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                     Employee & Salary Management
                   </h2>
                   <p className="text-xs text-slate-600 mt-1">
@@ -1101,10 +1102,10 @@ export default function AdminDashboard() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
                   <button
                     onClick={() => setShowAddEmpModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#c2410c] hover:bg-[#9a3412] shadow-sm transition-all active:scale-95"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#c2410c] hover:bg-[#9a3412] shadow-sm transition-all active:scale-95"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Register New Staff</span>
@@ -1125,7 +1126,7 @@ export default function AdminDashboard() {
                   />
                 </div>
 
-                <div className="sm:w-48">
+                <div className="w-full sm:w-48">
                   <select
                     value={empFilterRole}
                     onChange={(e) => setEmpFilterRole(e.target.value)}
@@ -1139,9 +1140,98 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Employees Table */}
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                <table className="w-full text-left text-xs">
+              {/* ─── MOBILE CARDS VIEW (md:hidden) ─── */}
+              <div className="md:hidden divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-white">
+                {filteredEmployees.length === 0 ? (
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    No employee records found matching your query.
+                  </div>
+                ) : (
+                  filteredEmployees.map((emp) => (
+                    <div key={emp.id} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#9a3412] font-bold text-sm flex items-center justify-center shrink-0">
+                            {emp.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 text-sm truncate">{emp.name}</p>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="text-xs font-semibold text-slate-700">{emp.role}</span>
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                EMP-{emp.id.toString().padStart(4, "0")}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                            emp.status === "active"
+                              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                              : "bg-slate-100 text-slate-700 border border-slate-200"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              emp.status === "active" ? "bg-emerald-600" : "bg-slate-400"
+                            }`}
+                          />
+                          {emp.status}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">Monthly Salary</span>
+                          <span className="font-bold font-mono text-sm text-[#c2410c]">
+                            ৳{emp.salary ? Number(emp.salary).toLocaleString() : "0.00"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">Contact</span>
+                          <span className="text-slate-800 text-[11px] font-medium truncate block">
+                            {emp.phone || emp.email || "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setEditingEmp(emp)}
+                          className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors text-center"
+                        >
+                          Edit / Salary
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPwdModalEmp(emp);
+                            setNewPasswordEmp("");
+                          }}
+                          className="flex-1 py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>Password</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEmployee(emp)}
+                          className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors shrink-0"
+                          title="Delete Employee"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* ─── DESKTOP TABLE VIEW (hidden md:block) ─── */}
+              <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
+                <table className="w-full text-left text-xs min-w-[700px]">
                   <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-bold text-[10px]">
                     <tr>
                       <th className="py-3 px-4">Staff Member</th>
@@ -1256,15 +1346,15 @@ export default function AdminDashboard() {
             TAB 4: CUSTOMERS & PASSWORDS (USER EXPLICIT REQUEST)
         ══════════════════════════════════════════════════════════════ */}
         {activeTab === "customers" && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+          <div className="space-y-6 animate-fade-in w-full min-w-0">
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-sm w-full min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-800 mb-2">
                     <span className="w-2 h-2 rounded-full bg-blue-600" />
                     Customer Database Administration
                   </div>
-                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                     Customer Account Management
                   </h2>
                   <p className="text-xs text-slate-600 mt-1">
@@ -1272,10 +1362,10 @@ export default function AdminDashboard() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
                   <button
                     onClick={() => setShowAddCustModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#c2410c] hover:bg-[#9a3412] shadow-sm transition-all active:scale-95"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#c2410c] hover:bg-[#9a3412] shadow-sm transition-all active:scale-95"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Register New Customer</span>
@@ -1296,7 +1386,7 @@ export default function AdminDashboard() {
                   />
                 </div>
 
-                <div className="sm:w-48">
+                <div className="w-full sm:w-48">
                   <select
                     value={custFilterType}
                     onChange={(e) => setCustFilterType(e.target.value)}
@@ -1309,9 +1399,96 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Customers Table */}
-              <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                <table className="w-full text-left text-xs">
+              {/* ─── MOBILE CUSTOMER CARDS (md:hidden) ─── */}
+              <div className="md:hidden divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-white">
+                {filteredCustomers.length === 0 ? (
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    No customer records found matching your query.
+                  </div>
+                ) : (
+                  filteredCustomers.map((cust) => (
+                    <div key={cust.id} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center shrink-0">
+                            {cust.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 text-sm truncate">{cust.name}</p>
+                            {cust.company_name && (
+                              <p className="text-[11px] text-[#c2410c] font-semibold truncate">
+                                {cust.company_name}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <span
+                          className={`inline-flex items-center text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                            cust.type === "commercial"
+                              ? "bg-purple-50 text-purple-800 border border-purple-200"
+                              : "bg-blue-50 text-blue-800 border border-blue-200"
+                          }`}
+                        >
+                          {cust.type}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1.5 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div className="flex items-center justify-between text-slate-700">
+                          <span className="text-[10px] uppercase font-bold text-slate-400">Email:</span>
+                          <span className="font-medium truncate max-w-[200px]">{cust.email}</span>
+                        </div>
+                        {cust.phone && (
+                          <div className="flex items-center justify-between text-slate-700">
+                            <span className="text-[10px] uppercase font-bold text-slate-400">Phone:</span>
+                            <span className="font-medium">{cust.phone}</span>
+                          </div>
+                        )}
+                        {cust.address && (
+                          <div className="text-slate-600 pt-1 border-t border-slate-200/60 text-[11px]">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Address:</span>
+                            <p className="line-clamp-2">{cust.address}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setEditingCust(cust)}
+                          className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors text-center"
+                        >
+                          Edit Profile
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPwdModalCust(cust);
+                            setNewPasswordCust("");
+                          }}
+                          className="flex-1 py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>Password</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCustomer(cust)}
+                          className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors shrink-0"
+                          title="Delete Customer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* ─── DESKTOP TABLE VIEW (hidden md:block) ─── */}
+              <div className="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
+                <table className="w-full text-left text-xs min-w-[700px]">
                   <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider font-bold text-[10px]">
                     <tr>
                       <th className="py-3 px-4">Customer</th>

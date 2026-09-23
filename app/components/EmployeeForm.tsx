@@ -181,10 +181,10 @@ export default function EmployeeForm({ onSaved }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start w-full min-w-0">
         {/* Registration Form (5 cols) */}
         <form
-          className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm space-y-4 lg:col-span-5"
+          className="bg-white p-4 sm:p-7 rounded-2xl border border-slate-200 shadow-sm space-y-4 lg:col-span-5 w-full min-w-0"
           onSubmit={handleSubmit}
         >
           <div>
@@ -298,7 +298,7 @@ export default function EmployeeForm({ onSaved }: Props) {
         </form>
 
         {/* Current Staff Register (7 cols) */}
-        <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-sm lg:col-span-7 space-y-4">
+        <div className="bg-white p-4 sm:p-7 rounded-2xl border border-slate-200 shadow-sm lg:col-span-7 space-y-4 w-full min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
             <div>
               <h4 className="text-base font-bold text-slate-900">
@@ -330,22 +330,22 @@ export default function EmployeeForm({ onSaved }: Props) {
               {filteredEmployees.map((e: any) => (
                 <div
                   key={e.id}
-                  className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors"
+                  className="p-3 sm:p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-300 transition-colors w-full min-w-0"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-orange-100 text-[#9a3412] font-bold text-xs flex items-center justify-center">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-orange-100 text-[#9a3412] font-bold text-xs flex items-center justify-center shrink-0">
                       {e.name?.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-900">{e.name}</p>
-                      <p className="text-[11px] text-slate-500">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 truncate">{e.name}</p>
+                      <p className="text-[11px] text-slate-500 truncate">
                         {e.role} • {e.email || "No email"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-3">
-                    <div className="text-right">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60">
+                    <div className="text-left sm:text-right">
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
                         Monthly Salary
                       </span>
@@ -354,7 +354,7 @@ export default function EmployeeForm({ onSaved }: Props) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
                       <button
                         type="button"
                         onClick={() => setEditingEmp(e)}
