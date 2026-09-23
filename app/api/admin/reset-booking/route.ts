@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import { getPool } from "@/lib/db";
 
-const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "fuelflow",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+const db = getPool();
 
 export async function POST(request: NextRequest) {
   try {

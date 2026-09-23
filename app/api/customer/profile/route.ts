@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import { createConnection } from "@/lib/db";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -18,12 +18,7 @@ export async function GET(request: NextRequest) {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     const customerId = decoded.id;
 
-    const connection = await mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "fuelflow",
-    });
+    const connection = await createConnection();
 
     const [rows] = await connection.execute(
       "SELECT id, type, name, company_name, phone, email, address, created_at FROM customers WHERE id = ?",

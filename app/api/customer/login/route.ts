@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import { createConnection } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -16,12 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const connection = await mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "fuelflow",
-    });
+    const connection = await createConnection();
 
     const [rows] = await connection.execute(
       "SELECT * FROM customers WHERE email = ?",

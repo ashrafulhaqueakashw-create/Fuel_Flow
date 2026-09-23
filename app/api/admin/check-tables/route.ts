@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import { createConnection } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
-    const connection = await mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "fuelflow",
-    });
+    const connection = await createConnection();
 
     // Check what tables exist
     const [tables] = await connection.execute("SHOW TABLES");

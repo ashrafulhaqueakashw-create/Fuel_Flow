@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import mysql from "mysql2/promise";
+import { createConnection } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   let connection;
 
   try {
-    connection = await mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "",
-      database: "fuelflow",
-    });
+    connection = await createConnection();
 
     console.log("Connected to database successfully");
 
