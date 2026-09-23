@@ -2,6 +2,17 @@
 "use client";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Shield,
+  Briefcase,
+  User,
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 
 type LoginResponse = {
   message: string;
@@ -23,6 +34,7 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
   const [userType, setUserType] = useState<UserType>(defaultUserType);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [loading, setLoading] = useState(false);
@@ -40,7 +52,6 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
       errs.password = "Password must be at least 6 characters";
 
     setFieldErrors(errs);
-    // focus first invalid field
     if (errs.username) {
       usernameRef.current?.focus();
     } else if (errs.password) {
@@ -111,37 +122,39 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
     }
   };
 
+  const handleQuickFill = (type: UserType) => {
+    setUserType(type);
+    setError("");
+    setFieldErrors({});
+    if (type === "admin") {
+      setUsername("admin");
+      setPassword("admin123");
+    } else if (type === "employee") {
+      setUsername("staff@fuelflow.com");
+      setPassword("staff123");
+    } else {
+      setUsername("customer@fuelflow.com");
+      setPassword("customer123");
+    }
+  };
+
   return (
-    <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-      {/* Title */}
+    <form className="space-y-5" onSubmit={handleSubmit} noValidate>
       <div>
-        <h2 className="text-xl font-bold text-white text-center">
-          Access Console
-        </h2>
-        <p className="text-gray-400 text-xs text-center mt-1">
-          Select portal and enter authorization
+        <h3 className="text-xl font-bold text-slate-900 text-center tracking-tight">
+          Sign In to Your Account
+        </h3>
+        <p className="text-slate-500 text-xs text-center mt-1">
+          Select your portal role to access system dashboards
         </p>
       </div>
 
-      {/* Segmented Control for Portal Selection */}
-      <div className="space-y-2">
-        <label className="block text-gray-300 text-xs font-semibold uppercase tracking-wider">
-          System Portal
+      {/* Segmented Control for Role Selection */}
+      <div className="space-y-1.5">
+        <label className="block text-slate-700 text-xs font-semibold uppercase tracking-wider">
+          Select Role
         </label>
-        <div className="relative flex p-1 bg-white/5 border border-white/10 rounded-xl">
-          {/* Animated Highlight */}
-          <div
-            className="absolute top-1 bottom-1 rounded-lg bg-gradient-to-r from-primary-600 to-primary-700 shadow-md transition-all duration-300 ease-out"
-            style={{
-              left:
-                userType === "admin"
-                  ? "4px"
-                  : userType === "employee"
-                    ? "calc(33.33% + 2px)"
-                    : "calc(66.66% + 1px)",
-              width: "calc(33.33% - 4px)",
-            }}
-          />
+        <div className="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
           <button
             type="button"
             onClick={() => {
@@ -149,10 +162,14 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
               setError("");
               setFieldErrors({});
             }}
-            className={`relative z-10 w-1/3 py-2 text-xs font-medium rounded-lg transition-colors duration-200 ${userType === "admin" ? "text-white" : "text-gray-400 hover:text-white"
-              }`}
+            className={`w-1/3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              userType === "admin"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
           >
-            Admin
+            <Shield className="w-3.5 h-3.5 text-slate-500" />
+            <span>Admin</span>
           </button>
           <button
             type="button"
@@ -161,10 +178,14 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
               setError("");
               setFieldErrors({});
             }}
-            className={`relative z-10 w-1/3 py-2 text-xs font-medium rounded-lg transition-colors duration-200 ${userType === "employee" ? "text-white" : "text-gray-400 hover:text-white"
-              }`}
+            className={`w-1/3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              userType === "employee"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
           >
-            Employee
+            <Briefcase className="w-3.5 h-3.5 text-slate-500" />
+            <span>Employee</span>
           </button>
           <button
             type="button"
@@ -173,10 +194,14 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
               setError("");
               setFieldErrors({});
             }}
-            className={`relative z-10 w-1/3 py-2 text-xs font-medium rounded-lg transition-colors duration-200 ${userType === "customer" ? "text-white" : "text-gray-400 hover:text-white"
-              }`}
+            className={`w-1/3 py-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              userType === "customer"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
           >
-            Customer
+            <User className="w-3.5 h-3.5 text-slate-500" />
+            <span>Customer</span>
           </button>
         </div>
       </div>
@@ -184,114 +209,142 @@ export default function LoginForm({ defaultUserType = "admin" }: LoginFormProps)
       {error && (
         <div
           role="alert"
-          className="bg-red-500/10 border border-red-500/30 text-red-200 px-4 py-3 rounded-xl text-sm animate-shake"
+          className="bg-red-50 border border-red-200 text-red-700 px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2"
         >
-          {error}
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {/* Username / Email Field */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <label
-          className="block text-gray-300 text-xs font-semibold uppercase tracking-wider"
+          className="block text-slate-700 text-xs font-semibold"
           htmlFor="username"
         >
           {userType === "admin" ? "Username" : "Email Address"}
         </label>
         <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            {userType === "admin" ? (
+              <User className="w-4 h-4" />
+            ) : (
+              <Mail className="w-4 h-4" />
+            )}
+          </div>
           <input
             ref={usernameRef}
-            className={`w-full px-4 py-3 bg-white/5 border text-sm text-white placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all ${fieldErrors.username
-                ? "border-red-500/50 focus:border-red-500"
-                : "border-white/10 focus:border-primary-500"
-              }`}
+            className={`w-full pl-10 pr-4 py-2.5 bg-white border text-sm text-slate-900 placeholder-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all ${
+              fieldErrors.username
+                ? "border-red-400"
+                : "border-slate-200"
+            }`}
             type={userType === "admin" ? "text" : "email"}
             name="username"
             id="username"
             autoComplete={userType === "admin" ? "username" : "email"}
             aria-invalid={!!fieldErrors.username}
-            aria-describedby={
-              fieldErrors.username ? "username-error" : undefined
-            }
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder={
-              userType === "admin" ? "Enter username" : "name@example.com"
+              userType === "admin" ? "admin" : "name@example.com"
             }
           />
         </div>
         {fieldErrors.username && (
-          <p id="username-error" className="text-xs text-red-400 mt-1">
-            {fieldErrors.username}
-          </p>
+          <p className="text-[11px] text-red-600 mt-0.5">{fieldErrors.username}</p>
         )}
       </div>
 
       {/* Password Field */}
-      <div className="space-y-1.5">
+      <div className="space-y-1">
         <label
-          className="block text-gray-300 text-xs font-semibold uppercase tracking-wider"
+          className="block text-slate-700 text-xs font-semibold"
           htmlFor="password"
         >
           Password
         </label>
-        <input
-          ref={passwordRef}
-          className={`w-full px-4 py-3 bg-white/5 border text-sm text-white placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all ${fieldErrors.password
-              ? "border-red-500/50 focus:border-red-500"
-              : "border-white/10 focus:border-primary-500"
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <Lock className="w-4 h-4" />
+          </div>
+          <input
+            ref={passwordRef}
+            className={`w-full pl-10 pr-10 py-2.5 bg-white border text-sm text-slate-900 placeholder-slate-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all ${
+              fieldErrors.password
+                ? "border-red-400"
+                : "border-slate-200"
             }`}
-          type="password"
-          name="password"
-          id="password"
-          autoComplete="current-password"
-          aria-invalid={!!fieldErrors.password}
-          aria-describedby={fieldErrors.password ? "password-error" : undefined}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-        />
+            type={showPassword ? "text" : "password"}
+            name="password"
+            id="password"
+            autoComplete="current-password"
+            aria-invalid={!!fieldErrors.password}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-700"
+          >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
         {fieldErrors.password && (
-          <p id="password-error" className="text-xs text-red-400 mt-1">
-            {fieldErrors.password}
-          </p>
+          <p className="text-[11px] text-red-700 font-medium mt-0.5">{fieldErrors.password}</p>
         )}
       </div>
 
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full relative overflow-hidden py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/50 shadow-lg shadow-primary-600/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+        className="w-full py-2.5 rounded-xl text-xs font-bold text-white bg-[#c2410c] hover:bg-[#9a3412] transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
         disabled={loading}
       >
         {loading ? (
-          <div className="flex items-center justify-center space-x-2">
-            <svg
-              className="animate-spin h-4 w-4 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-            <span>Securing Connection...</span>
-          </div>
+          <span>Signing In...</span>
         ) : (
-          `Authenticate as ${userType.charAt(0).toUpperCase() + userType.slice(1)
-          }`
+          <>
+            <span>
+              Sign In as {userType.charAt(0).toUpperCase() + userType.slice(1)}
+            </span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </>
         )}
       </button>
+
+      {/* 1-Click Demo Fill for easy test */}
+      <div className="pt-3 border-t border-slate-100">
+        <p className="text-center text-[11px] text-slate-600 font-medium mb-2">
+          Quick Demo Credentials (1-click autofill):
+        </p>
+        <div className="grid grid-cols-3 gap-1.5">
+          <button
+            type="button"
+            onClick={() => handleQuickFill("admin")}
+            className="py-1.5 px-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200 transition-colors"
+          >
+            Admin Demo
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickFill("employee")}
+            className="py-1.5 px-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200 transition-colors"
+          >
+            Staff Demo
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickFill("customer")}
+            className="py-1.5 px-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200 transition-colors"
+          >
+            Customer Demo
+          </button>
+        </div>
+      </div>
     </form>
   );
 }

@@ -29,8 +29,16 @@ export const POST = async (request: Request) => {
 
   const employee = rows[0];
 
-  // compare password with bcrypt hash
-  const ok = await bcrypt.compare(password, employee.password_hash);
+  // compare password with bcrypt hash (supports $2y$ from PHP)
+  let ok = false;
+  if (employee.password_hash) {
+    try {
+      const normalizedHash = employee.password_hash.replace(/^\$2y\$/, "$2a$");
+      ok = await bcrypt.compare(password, normalizedHash);
+    } catch {
+      ok = false;
+    }
+  }
   if (!ok)
     return NextResponse.json(
       { message: "Invalid credentials" },

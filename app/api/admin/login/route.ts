@@ -26,7 +26,8 @@ export const POST = async (request: Request) => {
   let ok = password === admin.password;
   if (!ok && admin.password) {
     try {
-      ok = await bcrypt.compare(password, admin.password);
+      const normalizedHash = admin.password.replace(/^\$2y\$/, "$2a$");
+      ok = await bcrypt.compare(password, normalizedHash);
     } catch {
       ok = false;
     }

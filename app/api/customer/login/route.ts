@@ -39,7 +39,15 @@ export async function POST(request: NextRequest) {
     }
 
     const customer = customers[0];
-    const isPasswordValid = await bcrypt.compare(password, customer.password);
+    let isPasswordValid = false;
+    if (customer.password) {
+      try {
+        const normalizedHash = customer.password.replace(/^\$2y\$/, "$2a$");
+        isPasswordValid = await bcrypt.compare(password, normalizedHash);
+      } catch {
+        isPasswordValid = false;
+      }
+    }
 
     if (!isPasswordValid) {
       return NextResponse.json(
